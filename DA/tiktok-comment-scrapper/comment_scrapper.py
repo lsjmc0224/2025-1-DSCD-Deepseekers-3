@@ -14,7 +14,7 @@ __version__ = '2.1.0'
 @click.option(
     "--input_csv",
     help='CSV file containing video IDs',
-    default='tiktok_video_ids_with_titles.csv'
+    default='data/tiktok_video_ids_with_titles.csv'
 )
 @click.option(
     "--output_file",
