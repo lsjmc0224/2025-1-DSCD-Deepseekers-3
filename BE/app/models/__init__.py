@@ -2,13 +2,10 @@ from .Keywords import *
 from .YoutubeChannels import *
 from .YoutubeVideos import *
 from .YoutubeComments import *
-from .CollectedYoutubeComments import *
 from .InstizPosts import *
 from .InstizComments import *
-from .CollectedInstizComments import *
 from .TiktokVideos import *
 from .TiktokComments import *
-from .CollectedTiktokComments import *
 from .Sentiments import *
 from .Aspects import *
 from .AnalysisLogs import *
