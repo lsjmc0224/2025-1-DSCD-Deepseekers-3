@@ -5,13 +5,16 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import googleapiclient.discovery
 import googleapiclient.errors
+from dotenv import load_dotenv
 
 class YouTubeCrawler:
     def __init__(self, api_key: Optional[str] = None):
         """
         :param api_key: YouTube Data API v3 키 (환경변수 또는 인자로 전달)
         """
-        self.api_key = api_key or os.getenv('YOUTUBE_API_KEY')
+        dotenv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), '.env')
+        load_dotenv(dotenv_path)
+        self.api_key = os.getenv('YOUTUBE_API_KEY')
         self.youtube = self.get_youtube_client(self.api_key)
 
     def get_youtube_client(self, api_key: str):
