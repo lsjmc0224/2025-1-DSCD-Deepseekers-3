@@ -13,7 +13,7 @@
 - **Collected 테이블**: 각 원본 데이터와 키워드의 관계, 실제 수집 시각을 기록합니다. (예: CollectedYoutubeComments, CollectedInstizPosts 등)
 - **수집 부분 ERD**
 
-![수집 부분 ERD](asset/수집 부분 ERD.png)
+![수집 부분 ERD](asset/collection_ERD.png)
 
 
 ### 2. 분석 부분
@@ -21,7 +21,7 @@
 - **AnalysisLogs, ContentAnalyses**: 분석 작업의 로그와, 각 문장/컨텐츠별 분석 결과를 저장합니다.
 - **분석 부분 ERD**
 
-![분석 부분 ERD](asset/분석 부분 ERD.png)
+![분석 부분 ERD](asset/analysis_ERD.png)
 
 ---
 
