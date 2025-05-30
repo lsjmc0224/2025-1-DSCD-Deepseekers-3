@@ -1,24 +1,24 @@
 # NLP 파이프라인 프로젝트
 
 ## 📁 디렉터리 구조
-NLP/
+kcelectra-base-DC/
 ├─ config/
-
-│ └─ default.yaml
-
+│   └─ default.yaml # 설정을 한 곳에서 관리 data, path, 파라미터 모두 여기서 조정
 ├─ src/
+│   ├─ text_cleaner.py
+│   ├─ sentence_splitter.py
+│   ├─ sentiment.py
+│   ├─ keyword_classifier.py
+│   └─ total.py
+├─ Data/
+│   └─ test_data_final.csv
+----------------------------------- 로컬에서 저장된 거 쓰는 경우에만 아래 파일 필요
+└─ Bert_model_beomi_KcELECTRA-base-v2022_maxlen_64/
+    ├─ config.json
+    ├─ vocab.txt
+    ├─ tf_model.h5
+    └─ …
 
-│ ├─ text_cleaner.py        코멘트 정제
-
-│ ├─ sentence_splitter.py   문장 단위 분리
-
-│ ├─ sentiment.py           감성 분류 
-
-│ ├─ keyword_classifier.py  키워드 멀티레이블 분류
-
-│ └─ total.py               1~4 단계 순차 실행
-
-└─ README.md
 
 
 ## ⚙️ 설치 및 실행
