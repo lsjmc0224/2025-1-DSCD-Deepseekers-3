@@ -1,0 +1,30 @@
+data:
+  # 최초 처리할 원본 CSV 파일 경로
+  input_csv: "C:/Users/parkm/NLP/Data/test_data_final.csv"
+  # 단계별 중간 결과를 저장할 디렉토리
+  intermediate_dir: "C:/Users/parkm/NLP/Data/intermediate"
+  # 최종 결과 CSV 파일 경로
+  output_csv: "C:/Users/parkm/NLP/Data/test_data_final_processed.csv"
+  # DataFrame 컬럼명
+  id_col: "ID"
+  time_col: "작성시간"  # 작성시간이 없는 경우 빈 문자열로 처리
+
+paths:
+  # 모듈 스크립트(.py)들이 위치한 디렉토리
+  scripts_dir: "C:/Users/parkm/NLP/source"
+  # 학습된 KcELECTRA 모델이 저장된 디렉토리
+  model_dir: "C:/Users/parkm/NLP/Bert_model_beomi_KcELECTRA-base-v2022_maxlen_64"
+
+sentiment:
+  # 토크나이저/모델 max_length 파라미터
+  max_length: 64
+  # 배치 크기
+  batch_size: 16
+
+pipeline:
+  # 파이프라인 실행 시 중간결과 저장할지말지
+  save_intermediate: False
+
+log:
+  # 로깅 레벨 (DEBUG, INFO, WARNING, ERROR)
+  level: "INFO"
