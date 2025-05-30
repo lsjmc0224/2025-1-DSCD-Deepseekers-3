@@ -13,7 +13,7 @@ paths:
   # 모듈 스크립트(.py)들이 위치한 디렉토리
   scripts_dir: "C:/Users/parkm/NLP/source"
   # 학습된 KcELECTRA 모델이 저장된 디렉토리
-  model_dir: "C:/Users/parkm/NLP/Bert_model_beomi_KcELECTRA-base-v2022_maxlen_64"
+  model_dir: "alsxxxz/kcelectra-base-DC"  
 
 sentiment:
   # 토크나이저/모델 max_length 파라미터
