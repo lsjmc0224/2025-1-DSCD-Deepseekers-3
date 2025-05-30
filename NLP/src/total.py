@@ -50,7 +50,7 @@ def main(config_path: Path):
     intermediate = Path(data_cfg['intermediate_dir'])     # 중간 결과 폴더
     output_csv   = Path(data_cfg['output_csv'])           # 최종 저장 CSV
     scripts_dir  = Path(paths_cfg['scripts_dir'])         # 모듈(.py) 위치
-    model_dir    = Path(paths_cfg['model_dir'])           # KcELECTRA 모델 폴더 config.json 이런거 5개
+    model_dir    = paths_cfg['model_dir']                 # KcELECTRA 모델 폴더 config.json 이런거 5개
 
     # 중간 결과 저장할 폴더없으면 자동생성
     intermediate.mkdir(parents=True, exist_ok=True)
@@ -90,7 +90,7 @@ def main(config_path: Path):
         [
             '--input',      str(split_out),
             '--output',     str(senti_out),
-            '--model-dir',  str(model_dir),
+            '--model-dir',  model_dir,
             '--text-col',   'divided_comment',
             '--output-col','sentiment',
             '--max-length', str(cfg['sentiment']['max_length']),
