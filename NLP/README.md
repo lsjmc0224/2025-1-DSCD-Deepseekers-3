@@ -3,13 +3,21 @@
 ## 📁 디렉터리 구조
 NLP/
 ├─ config/
+
 │ └─ default.yaml
+
 ├─ src/
+
 │ ├─ text_cleaner.py        코멘트 정제
+
 │ ├─ sentence_splitter.py   문장 단위 분리
+
 │ ├─ sentiment.py           감성 분류 
+
 │ ├─ keyword_classifier.py  키워드 멀티레이블 분류
+
 │ └─ total.py               1~4 단계 순차 실행
+
 └─ README.md
 
 
