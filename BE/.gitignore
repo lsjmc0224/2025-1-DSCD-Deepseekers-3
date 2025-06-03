@@ -182,3 +182,4 @@ asset/source
 *.h5
 *.bin
 *.zip
+.idea/
