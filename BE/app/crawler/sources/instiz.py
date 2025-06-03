@@ -1,5 +1,3 @@
-# 여기에 인스티즈 크롤러 코드 작성
-
 import urllib.request
 import datetime
 from bs4 import BeautifulSoup
@@ -8,20 +6,31 @@ import re
 import urllib.parse
 import pandas as pd
 
+from app.models import Keywords
+
 class InstizCrawler:
     def __init__(self):
         # 현재는 초기화할 값이 없으나, 확장성을 위해 남겨둡니다.
         pass
 
-    async def crawl(self, keyword: str, starttime: str, endtime: str):
+    async def crawl(self, keyword: Keywords, starttime: str, endtime: str):
         """
         인스티즈 '익명잡담' 게시판에서 특정 키워드로 검색된 글들을 크롤링하여
-        InstizPosts 모델 형태의 dict 리스트로 반환합니다.
+        InstizPosts 모델에 저장하기 적합한 dict 리스트로 반환합니다.
+
+        Parameters:
+            keyword (Keywords): 키워드 모델 인스턴스 (keyword.id, keyword.keyword 사용)
+            starttime (str): 검색 시작 날짜 (형식: YYYYMMDD)
+            endtime (str): 검색 종료 날짜 (형식: YYYYMMDD)
+
+        Returns:
+            List[dict]: InstizPosts 테이블 저장용 데이터 리스트
         """
         results = []
         base_url = "https://www.instiz.net"
-        encoded_keyword = urllib.parse.quote(keyword, safe='')
+        encoded_keyword = urllib.parse.quote(keyword.keyword, safe='')
         now_year = datetime.datetime.now().year
+        collected_time = datetime.datetime.utcnow()
 
         for page in range(1, 100):
             try:
@@ -49,7 +58,7 @@ class InstizCrawler:
 
                     valid_post_found = True
 
-                    # 날짜
+                    # 날짜 파싱
                     time_cell = row.select_one('td.listno.regdate')
                     if time_cell:
                         timestr = time_cell.get_text(strip=True)
@@ -84,6 +93,7 @@ class InstizCrawler:
                         clean_text = ''
 
                     results.append({
+                        "keyword_id": keyword.id,
                         "content": clean_text,
                         "view_count": view,
                         "like_count": like,
@@ -91,11 +101,13 @@ class InstizCrawler:
                         "post_url": post_url,
                         "created_at": parsed_time,
                         "updated_at": parsed_time,
+                        "collected_at": collected_time,
+                        # "is_analyzed": False → 저장 시점에서 처리
                     })
-                # 만약 green이 아닌 정상 게시글이 하나도 없으면 break
+
                 if not valid_post_found:
                     break
-            except Exception as e:
+            except Exception:
                 continue
 
         return results
