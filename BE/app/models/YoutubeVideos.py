@@ -5,7 +5,6 @@ class YoutubeVideos(Base):
     __tablename__ = "youtube_videos"
     id = Column(Text, primary_key=True, comment="API에서 가져온 video ID")
     channel_id = Column(Text, ForeignKey("youtube_channels.id"), comment="채널 ID")
-    keyword_id = Column(Integer, ForeignKey("keywords.id"), comment="키워드 ID")
     created_at = Column(TIMESTAMP, comment="영상 업로드 시각")
     collected_at = Column(TIMESTAMP, comment="영상 수집 시각")
     like_count = Column(Integer, comment="좋아요 수")

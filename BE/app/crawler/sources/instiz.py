@@ -88,13 +88,23 @@ class InstizCrawler:
                         for tag in content_div.xpath('.//script | .//style | .//img'):
                             tag.getparent().remove(tag)
                         text = content_div.text_content()
-                        clean_text = re.sub(r'\s+', ' ', text).strip()
+                        clean_body = re.sub(r'\s+', ' ', text).strip()
                     except Exception:
-                        clean_text = ''
+                        clean_body = ''
+
+                    # ✅ '죄송해요,' 안내글 거르기
+                    if clean_body.startswith("죄송해요,"):
+                        continue
+
+                    # ✅ 제목 + 본문 조합
+                    title_text = title_cell.get_text(strip=True)
+                    full_content = f"{title_text} {clean_body}".strip()
+
+
 
                     results.append({
                         "keyword_id": keyword.id,
-                        "content": clean_text,
+                        "content": full_content,
                         "view_count": view,
                         "like_count": like,
                         "comment_count": comment,
@@ -102,7 +112,6 @@ class InstizCrawler:
                         "created_at": parsed_time,
                         "updated_at": parsed_time,
                         "collected_at": collected_time,
-                        # "is_analyzed": False → 저장 시점에서 처리
                     })
 
                 if not valid_post_found:

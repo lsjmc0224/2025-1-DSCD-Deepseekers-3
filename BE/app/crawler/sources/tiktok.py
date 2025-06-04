@@ -2,6 +2,7 @@
 
 import time
 import re
+import emoji
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -9,13 +10,25 @@ from .tiktokcomment import TiktokComment
 from .tiktokcomment.typing import Comments, Comment
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+from app.models import Keywords
 
 class TikTokCrawler:
     def __init__(self):
         # 현재는 초기화할 값이 없습니다.
         pass
 
-    async def crawl(self, keyword: str, start_date: str, end_date: str) -> List[Dict[str, Any]]:
+    def _is_valid_korean_content(self, text: str) -> bool:
+        _emoji_pattern = emoji.get_emoji_regexp()
+
+        if any(kw in text for kw in ("레시피", "만들기")):
+            return False
+        if re.search(r"https?://\S+", text):
+            return False
+        if not re.search(r"[가-힣]", text):
+            return False
+        return True
+
+    async def crawl(self, keyword: Keywords, start_date: str, end_date: str) -> List[Dict[str, Any]]:
         """
         구글 검색을 통해 TikTok 영상을 크롤링합니다.
         :param keyword: 검색 키워드
@@ -24,7 +37,7 @@ class TikTokCrawler:
         :return: 각 영상에 대해 {id, title, video_url} dict의 리스트
         """
         # 구글 검색 쿼리 생성 (기간 필터 포함)
-        query = f'{keyword}+tiktok+after%3A{start_date}+before%3A{end_date}'
+        query = f'{keyword.keyword}+tiktok+after%3A{start_date}+before%3A{end_date}'
         target_url = f"https://www.google.com/search?q={query}&num=12&udm=39"
 
         options = Options()
@@ -38,7 +51,7 @@ class TikTokCrawler:
 
         results = []
         scroll_count = 0
-        MAX_ITEMS = 100
+        MAX_ITEMS = 10
         WAIT = 2
 
         def click_more_results_if_available():
@@ -65,11 +78,18 @@ class TikTokCrawler:
                         title = heading_div.get_attribute("aria-label") or heading_div.text.strip()
                     except:
                         title = ""
+                    if not title or not self._is_valid_korean_content(title):
+                        continue
+
                     if not any(item['id'] == video_id for item in results):
+                        collected_time = datetime.now()
+
                         results.append({
                             'id': video_id,
                             'title': title,
-                            'video_url': url
+                            'video_url': url,
+                            'keyword_id': keyword.id,
+                            'collected_at': collected_time
                         })
                     if len(results) >= MAX_ITEMS:
                         break
@@ -105,10 +125,12 @@ class TikTokCrawler:
         try:
             comments_obj: Comments = scraper(aweme_id=video_id)
             for comment in comments_obj.comments:
+                if not self._is_valid_korean_content(comment.comment):
+                    continue
                 results.append({
                     "id": comment.comment_id,
                     "video_id": video_id,
-                    "text": comment.comment,
+                    "content": comment.comment,
                     "reply_count": comment.total_reply,
                     "user_id": comment.username,
                     "nickname": comment.nickname,
@@ -120,7 +142,7 @@ class TikTokCrawler:
                     results.append({
                         "id": reply.comment_id,
                         "video_id": video_id,
-                        "text": reply.comment,
+                        "content": reply.comment,
                         "reply_count": reply.total_reply,
                         "user_id": reply.username,
                         "nickname": reply.nickname,
