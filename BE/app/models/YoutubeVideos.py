@@ -3,6 +3,7 @@ from app.core.db import Base
 
 class YoutubeVideos(Base):
     __tablename__ = "youtube_videos"
+
     id = Column(Text, primary_key=True, comment="API에서 가져온 video ID")
     channel_id = Column(Text, ForeignKey("youtube_channels.id", ondelete="CASCADE"), comment="채널 ID")
     created_at = Column(TIMESTAMP, comment="영상 업로드 시각")
@@ -12,6 +13,10 @@ class YoutubeVideos(Base):
     view_count = Column(Integer, comment="조회수")
     updated_at = Column(TIMESTAMP, comment="영상 정보 갱신 시각")
     video_type = Column(Text, comment="숏폼(short), 롱폼(long) 영상 타입 정보")
+
+    # ✅ 추가된 필드
+    title = Column(Text, nullable=True, comment="영상 제목")
+    thumbnail_url = Column(Text, nullable=True, comment="썸네일 이미지 URL")
 
     __table_args__ = (
         Index("idx_youtube_videos_created_at", "created_at"),

@@ -28,15 +28,14 @@ class TikTokCrawler:
             return False
         return True
 
-    async def crawl(self, keyword: Keywords, start_date: str, end_date: str) -> List[Dict[str, Any]]:
+    async def crawl(self, keyword: Keywords, start_date: str, end_date: str) -> Dict[str, List[Dict[str, Any]]]:
         """
-        구글 검색을 통해 TikTok 영상을 크롤링합니다.
-        :param keyword: 검색 키워드
-        :param start_date: 시작일 (YYYY-MM-DD)
-        :param end_date: 종료일 (YYYY-MM-DD)
-        :return: 각 영상에 대해 {id, title, video_url} dict의 리스트
+        TikTok 영상 및 댓글을 함께 크롤링합니다.
+        :return: {
+            "videos": [video_dict, ...],
+            "comments": [comment_dict, ...]
+        }
         """
-        # 구글 검색 쿼리 생성 (기간 필터 포함)
         query = f'{keyword.keyword}+tiktok+after%3A{start_date}+before%3A{end_date}'
         target_url = f"https://www.google.com/search?q={query}&num=12&udm=39"
 
@@ -49,7 +48,9 @@ class TikTokCrawler:
         driver.get(target_url)
         time.sleep(2)
 
-        results = []
+        videos = []
+        all_comments = []
+
         scroll_count = 0
         MAX_ITEMS = 10
         WAIT = 2
@@ -64,7 +65,7 @@ class TikTokCrawler:
             except:
                 return False
 
-        while len(results) < MAX_ITEMS and scroll_count < 30:
+        while len(videos) < MAX_ITEMS and scroll_count < 30:
             link_elements = driver.find_elements(By.XPATH, '//a[contains(@href, "tiktok.com/") and contains(@href, "/video/")]')
             for link_el in link_elements:
                 try:
@@ -81,17 +82,24 @@ class TikTokCrawler:
                     if not title or not self._is_valid_korean_content(title):
                         continue
 
-                    if not any(item['id'] == video_id for item in results):
+                    if not any(item['id'] == video_id for item in videos):
                         collected_time = datetime.now()
 
-                        results.append({
+                        video = {
                             'id': video_id,
                             'title': title,
                             'video_url': url,
                             'keyword_id': keyword.id,
                             'collected_at': collected_time
-                        })
-                    if len(results) >= MAX_ITEMS:
+                        }
+                        videos.append(video)
+
+                        # ✅ 댓글 수집
+                        print(f"[LOG] 댓글 수집 중: {video_id}")
+                        comments = await self.crawl_comments(video_id)
+                        all_comments.extend(comments)
+
+                    if len(videos) >= MAX_ITEMS:
                         break
                 except Exception:
                     continue
@@ -100,8 +108,14 @@ class TikTokCrawler:
                 time.sleep(WAIT)
             scroll_count += 1
             time.sleep(WAIT)
+
         driver.quit()
-        return results
+
+        return {
+            "videos": videos,
+            "comments": all_comments
+        }
+
 
     async def crawl_comments(self, video_id: str) -> List[Dict[str, Any]]:
         """

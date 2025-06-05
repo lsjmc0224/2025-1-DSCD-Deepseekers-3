@@ -1,4 +1,5 @@
 import os
+import re
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import googleapiclient.discovery
@@ -15,6 +16,16 @@ class YouTubeCrawler:
         load_dotenv(dotenv_path)
         self.api_key = os.getenv('YOUTUBE_API_KEY')
         self.youtube = self.get_youtube_client(self.api_key)
+
+    def _is_valid_korean_content(self, text: str) -> bool:
+
+        if any(kw in text for kw in ("레시피", "만들기")):
+            return False
+        if re.search(r"https?://\S+", text):
+            return False
+        if not re.search(r"[가-힣]", text):
+            return False
+        return True
 
     def get_youtube_client(self, api_key: str):
         if not api_key:
@@ -35,7 +46,7 @@ class YouTubeCrawler:
         max_results: int,
         published_after: Optional[str],
         published_before: Optional[str],
-        video_duration: Optional[str],  # ✅ "short", "medium", "long"
+        video_duration: Optional[str],  # "short", "medium", "long"
     ) -> List[Dict[str, Any]]:
         params = {
             "part": "snippet",
@@ -43,8 +54,9 @@ class YouTubeCrawler:
             "type": "video",
             "order": "relevance",
             "maxResults": max_results,
-            "videoDuration": video_duration or "any"  # ✅ 여기에 포함
+            "videoDuration": video_duration or "any"
         }
+
         if published_after:
             params["publishedAfter"] = self.yyyymmdd_to_rfc3339(published_after)
         if published_before:
@@ -58,7 +70,15 @@ class YouTubeCrawler:
             snippet = item["snippet"]
             channel_id = snippet["channelId"]
             published_at = snippet["publishedAt"]
+            title = snippet.get("title", "").strip()
 
+            # ✅ 타이틀이 유효한 한국어 콘텐츠인지 확인
+            if not self._is_valid_korean_content(title):
+                continue
+
+            thumbnail_url = snippet.get("thumbnails", {}).get("high", {}).get("url", "")
+
+            # 상세 정보 요청
             video_detail = self.youtube.videos().list(part="statistics,snippet", id=video_id).execute()
             video_info = video_detail["items"][0] if video_detail["items"] else {}
 
@@ -75,7 +95,9 @@ class YouTubeCrawler:
                 "comment_count": int(stats.get("commentCount", 0)) if "commentCount" in stats else None,
                 "view_count": int(stats.get("viewCount", 0)) if "viewCount" in stats else None,
                 "updated_at": snippet_detail.get("publishedAt"),
-                "video_type": video_duration,  # ✅ "short", "medium", "long"
+                "video_type": "short" if video_duration == "short" else "long",
+                "title": title,
+                "thumbnail_url": thumbnail_url,
             })
 
         return videos
