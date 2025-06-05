@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import SentimentSummaryCard from '../SentimentSummaryCard';
 import SentimentTrendChart from '../charts/SentimentTrendChart';
@@ -27,18 +26,18 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ channel, period, dateRange }) =
   // Platform-specific percentages and totals based on channel filter
   const getPlatformData = useMemo(() => {
     const baseTotals = {
-      youtube: 500,
-      tiktok: 500,
-      instiz: 500, // Changed from community to instiz
-      overall: 1500
+      youtube: 50,
+      tiktok: 50,
+      instiz: 50, // Changed from community to instiz
+      overall: 150
     };
 
     // Adjust totals based on period
     const periodMultiplier = {
-      "최근 7일": 1,
-      "최근 14일": 1.8,
-      "최근 30일": 3.5,
-      "사용자 지정": 2 // Default multiplier for custom range
+      "최근 7일": 0.1,
+      "최근 14일": 0.18,
+      "최근 30일": 0.35,
+      "사용자 지정": 0.2 // Default multiplier for custom range
     };
 
     const multiplier = periodMultiplier[period as keyof typeof periodMultiplier] || 1;
@@ -130,36 +129,36 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ channel, period, dateRange }) =
   const getSummaryCardData = useMemo(() => {
     const baseData = {
       "최근 7일": {
-        positiveChange: "+8.5%",
-        positiveDelta: "2.1%",
-        negativeChange: "-1.2%",
-        negativeDelta: "0.4%",
-        totalChange: "+245",
-        totalDelta: "12.3%"
+        positiveChange: "+0.85%",
+        positiveDelta: "0.21%",
+        negativeChange: "-0.12%",
+        negativeDelta: "0.04%",
+        totalChange: "+24",
+        totalDelta: "1.23%"
       },
       "최근 14일": {
-        positiveChange: "+12.3%",
-        positiveDelta: "4.2%",
-        negativeChange: "-1.8%",
-        negativeDelta: "0.6%",
-        totalChange: "+382",
-        totalDelta: "15.8%"
+        positiveChange: "+1.23%",
+        positiveDelta: "0.42%",
+        negativeChange: "-0.18%",
+        negativeDelta: "0.06%",
+        totalChange: "+38",
+        totalDelta: "1.58%"
       },
       "최근 30일": {
-        positiveChange: "+16.8%",
-        positiveDelta: "9.4%",
-        negativeChange: "-3.5%",
-        negativeDelta: "1.7%",
-        totalChange: "+528",
-        totalDelta: "23.2%"
+        positiveChange: "+1.68%",
+        positiveDelta: "0.94%",
+        negativeChange: "-0.35%",
+        negativeDelta: "0.17%",
+        totalChange: "+52",
+        totalDelta: "2.32%"
       },
       "사용자 지정": {
-        positiveChange: "+14.2%",
-        positiveDelta: "5.8%",
-        negativeChange: "-2.1%",
-        negativeDelta: "0.9%",
-        totalChange: "+421",
-        totalDelta: "18.5%"
+        positiveChange: "+1.42%",
+        positiveDelta: "0.58%",
+        negativeChange: "-0.21%",
+        negativeDelta: "0.09%",
+        totalChange: "+42",
+        totalDelta: "1.85%"
       }
     };
 

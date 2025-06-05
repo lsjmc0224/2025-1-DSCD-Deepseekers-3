@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { 
   LineChart, 
@@ -71,27 +70,27 @@ const SentimentTrendChart: React.FC<SentimentTrendChartProps> = ({
       switch(selectedPlatform) {
         case "유튜브":
           // YouTube typically has higher engagement
-          positive = 60 + Math.floor(Math.random() * 25);
-          negative = 20 + Math.floor(Math.random() * 15);
-          neutral = 15 + Math.floor(Math.random() * 10);
+          positive = 6 + Math.floor(Math.random() * 2.5);
+          negative = 2 + Math.floor(Math.random() * 1.5);
+          neutral = 1.5 + Math.floor(Math.random() * 1);
           break;
         case "틱톡":
           // TikTok has more varied sentiment
-          positive = 45 + Math.floor(Math.random() * 20);
-          negative = 30 + Math.floor(Math.random() * 20);
-          neutral = 20 + Math.floor(Math.random() * 15);
+          positive = 4.5 + Math.floor(Math.random() * 2);
+          negative = 3 + Math.floor(Math.random() * 2);
+          neutral = 2 + Math.floor(Math.random() * 1.5);
           break;
         case "커뮤니티":
           // Community platforms tend to have more critical discussions
-          positive = 35 + Math.floor(Math.random() * 15);
-          negative = 40 + Math.floor(Math.random() * 20);
-          neutral = 25 + Math.floor(Math.random() * 15);
+          positive = 3.5 + Math.floor(Math.random() * 1.5);
+          negative = 4 + Math.floor(Math.random() * 2);
+          neutral = 2.5 + Math.floor(Math.random() * 1.5);
           break;
         default: // "전체"
           // Overall balanced data
-          positive = 45 + Math.floor(Math.random() * 20);
-          negative = 30 + Math.floor(Math.random() * 15);
-          neutral = 20 + Math.floor(Math.random() * 15);
+          positive = 4.5 + Math.floor(Math.random() * 2);
+          negative = 3 + Math.floor(Math.random() * 1.5);
+          neutral = 2 + Math.floor(Math.random() * 1.5);
       }
       
       const total = positive + negative + neutral;
