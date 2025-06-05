@@ -9,9 +9,11 @@ from .TiktokComments import *
 from .Sentiments import *
 from .Aspects import *
 from .AnalysisLogs import *
-from .ContentAnalyses import *
+from .ContentAnalysis import *
 from .Users import *
 from .CollectedYoutubeComments import *
 from .CollectedInstizPosts import *
 from .CollectedInstizComments import *
 from .CollectedTiktokComments import *
+from .CollectedYoutubeVideos import *
+from .CollectedTiktokVideos import *
