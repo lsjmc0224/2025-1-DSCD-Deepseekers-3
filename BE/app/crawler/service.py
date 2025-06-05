@@ -13,23 +13,11 @@ class CrawlerService:
         self.instiz_crawler = InstizCrawler()
         self.tiktok_crawler = TikTokCrawler()
 
-    async def crawl_youtube(self, keyword_obj: Keywords, starttime: str, endtime: str, max_videos: int = 5, max_comments: int = 20) -> Dict[str, int]:
-        result = await self.youtube_crawler.crawl(
-            keyword=keyword_obj,
-            max_videos=max_videos,
-            max_comments=max_comments,
-            published_after=starttime,
-            published_before=endtime
-        )
-        return result
-
     async def crawl_instiz(self, keyword_obj: Keywords, starttime: str, endtime: str) -> List[Dict[str, Any]]:
-        result = await self.instiz_crawler.crawl(keyword=keyword_obj, starttime=starttime, endtime=endtime)
-        return result
+        return await self.instiz_crawler.crawl(keyword=keyword_obj, starttime=starttime, endtime=endtime)
 
     async def crawl_tiktok(self, keyword_obj: Keywords, start_date: str, end_date: str) -> Dict[str, Any]:
-        videos = await self.tiktok_crawler.crawl(keyword=keyword_obj, start_date=start_date, end_date=end_date)
-        return {"videos": videos}
+        return await self.tiktok_crawler.crawl(keyword=keyword_obj, start_date=start_date, end_date=end_date)
 
     async def crawl_all(self, keyword_obj: Keywords, youtube_period: Dict[str, str], instiz_period: Dict[str, str], tiktok_period: Dict[str, str]) -> Dict[str, Any]:
         """
@@ -39,8 +27,6 @@ class CrawlerService:
         db = SessionLocal()
         repo = CrawlingRepository(db)
         try:
-
-
             # 1. Instiz
             try:
                 instiz_data = await self.instiz_crawler.crawl(
@@ -48,8 +34,7 @@ class CrawlerService:
                     starttime=instiz_period["starttime"],
                     endtime=instiz_period["endtime"]
                 )
-                instiz_save = repo.create_instiz_posts(instiz_data)
-                if not instiz_save:
+                if not repo.create_instiz_posts(instiz_data):
                     raise Exception("Instiz 저장 실패")
             except Exception as e:
                 db.rollback()
@@ -57,18 +42,25 @@ class CrawlerService:
 
             # 2. TikTok
             try:
-                tiktok_videos = await self.tiktok_crawler.crawl(
+                tiktok_data = await self.tiktok_crawler.crawl(
                     keyword=keyword_obj,
                     start_date=tiktok_period["start_date"],
                     end_date=tiktok_period["end_date"]
                 )
-                tiktok_save = repo.create_tiktok_videos(tiktok_videos)
-                if not tiktok_save:
-                    raise Exception("TikTok 저장 실패")
+
+                tiktok_videos = tiktok_data["videos"]
+                tiktok_comments = tiktok_data["comments"]
+
+                if tiktok_videos and not repo.create_tiktok_videos(tiktok_videos):
+                    raise Exception("TikTok 영상 저장 실패")
+
+                if tiktok_comments and not repo.create_tiktok_comments(tiktok_comments):
+                    raise Exception("TikTok 댓글 저장 실패")
+
             except Exception as e:
                 db.rollback()
                 return {"status": "fail", "message": f"[TikTok] 저장 실패: {str(e)}"}
-            
+
             # 3. YouTube
             try:
                 yt_result = await self.youtube_crawler.crawl(
@@ -78,12 +70,11 @@ class CrawlerService:
                     published_after=youtube_period["starttime"],
                     published_before=youtube_period["endtime"]
                 )
-                yt_save = repo.create_youtube_data(
+                if not repo.create_youtube_data(
                     channels=yt_result["channels"],
                     videos=yt_result["videos"],
                     comments=yt_result["comments"]
-                )
-                if not yt_save:
+                ):
                     raise Exception("YouTube 저장 실패")
             except Exception as e:
                 db.rollback()
@@ -95,4 +86,4 @@ class CrawlerService:
             db.rollback()
             return {"status": "fail", "message": f"[전체 실패] {str(e)}"}
         finally:
-            db.close() 
+            db.close()

@@ -38,7 +38,6 @@ class CrawlingRepository:
             else:
                 # 새로운 게시글이면 InstizPosts에 저장
                 new_post = InstizPosts(
-                    keyword_id=keyword_id,  # 원본 기록용
                     content=post["content"],
                     view_count=post["view_count"],
                     like_count=post["like_count"],
@@ -224,7 +223,9 @@ class CrawlingRepository:
                         comment_count=v["comment_count"],
                         view_count=v["view_count"],
                         updated_at=v["updated_at"],
-                        video_type=v["video_type"]
+                        video_type=v["video_type"],
+                        title=v.get("title", ""),
+                        thumbnail_url=v.get("thumbnail_url", "")
                     )
                     self.db.add(new_video)
                     self.db.flush()
@@ -278,7 +279,6 @@ class CrawlingRepository:
 
             self.db.commit()
 
-            # ✅ 성공한 경우에만 결과 반환
             return {
                 "channels_saved": saved_channels,
                 "videos_saved": saved_videos,
@@ -290,4 +290,4 @@ class CrawlingRepository:
         except IntegrityError as e:
             self.db.rollback()
             print(f"[ERROR] YouTube 데이터 저장 중 오류 발생: {e}")
-            return None  # ❌ 실패한 경우에는 결과 반환하지 않음
+            return None
