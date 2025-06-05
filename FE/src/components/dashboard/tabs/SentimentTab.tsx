@@ -78,29 +78,19 @@ const SentimentTab: React.FC<SentimentTabProps> = ({ channel, period, dateRange 
   // Dynamic keywords based on platform and period
   const getDynamicKeywords = useMemo(() => {
     const basePositiveKeywords = [
-      { text: "달달함", size: "xl" as const, type: "positive" as const },
-      { text: "부드럽다", size: "lg" as const, type: "positive" as const },
-      { text: "크림 가득", size: "lg" as const, type: "positive" as const },
-      { text: "밤 맛 진함", size: "md" as const, type: "positive" as const },
-      { text: "촉촉함", size: "md" as const, type: "positive" as const },
-      { text: "디저트로 딱", size: "md" as const, type: "positive" as const },
-      { text: "가성비 좋음", size: "sm" as const, type: "positive" as const },
-      { text: "은은한 향", size: "sm" as const, type: "positive" as const },
-      { text: "적당한 단맛", size: "sm" as const, type: "positive" as const },
-      { text: "정성스러움", size: "xs" as const, type: "positive" as const },
-      { text: "추천", size: "xs" as const, type: "positive" as const },
+      { text: "달달", size: "xl" as const, type: "positive" as const },
+      { text: "맛있", size: "lg" as const, type: "positive" as const },
+      { text: "촉촉", size: "md" as const, type: "positive" as const },
+      { text: "편의점", size: "md" as const, type: "positive" as const },
+      { text: "행복", size: "xs" as const, type: "positive" as const },
     ];
 
     const baseNegativeKeywords = [
-      { text: "너무 달다", size: "xl" as const, type: "negative" as const },
-      { text: "느끼함", size: "lg" as const, type: "negative" as const },
-      { text: "인공적인 맛", size: "lg" as const, type: "negative" as const },
-      { text: "단맛만 강함", size: "md" as const, type: "negative" as const },
-      { text: "밸런스 아쉬움", size: "md" as const, type: "negative" as const },
-      { text: "가격 비쌈", size: "md" as const, type: "negative" as const },
-      { text: "양 적음", size: "sm" as const, type: "negative" as const },
-      { text: "밤맛 약함", size: "sm" as const, type: "negative" as const },
-      { text: "유통기한 짧음", size: "xs" as const, type: "negative" as const },
+      { text: "느끼", size: "lg" as const, type: "negative" as const },
+      { text: "리뉴얼", size: "lg" as const, type: "negative" as const },
+      { text: "단맛", size: "md" as const, type: "negative" as const },
+      { text: "세븐", size: "md" as const, type: "negative" as const },
+      { text: "CU", size: "xs" as const, type: "negative" as const },
     ];
 
     // Platform-specific keyword variations
@@ -126,90 +116,83 @@ const SentimentTab: React.FC<SentimentTabProps> = ({ channel, period, dateRange 
     const allPositiveComments = [
       {
         id: "pc1",
-        text: "밤 티라미수는 크림이 가득해서 달콤하고 촉촉해요. 디저트로 먹기에 완벽하고 밤향이 은은해서 좋아요.",
-        date: new Date("2023-05-07T14:32:00"),
+        text: "밤티라미수 후기36 맛있긴 한데 또 찾아 먹을 맛은 아니지만 누가 주면 다 먹을 듯",
+        date: new Date("2023-10-07T14:32:00"),
         sentiment: "positive" as const,
-        source: "유튜브" as const
+        source: "인스티즈" as const
       },
       {
         id: "pc2",
-        text: "밤 티라미수의 크림이 정말 부드럽고 밤맛이 진해요. 가격도 부담없어서 자주 구매하게 되네요.",
-        date: new Date("2023-05-06T09:15:00"),
+        text: "쓰다보니 맛없는줄알겠는데 맛있음!",
+        date: new Date("2023-10-06T09:15:00"),
         sentiment: "positive" as const,
         source: "인스티즈" as const
       },
       {
         id: "pc3",
-        text: "밤 티라미수는 달달함이 적당해서 질리지 않아요. 특히 밤 조각이 들어있어서 씹는 맛이 좋아요.",
-        date: new Date("2023-05-04T16:22:00"),
+        text: "하나 먹어보고 너무 맛있어서 바로 하나 더 테이크아웃 해서 집에 가져옴..",
+        date: new Date("2023-10-04T16:22:00"),
         sentiment: "positive" as const,
-        source: "유튜브" as const
+        source: "인스티즈" as const
       },
       {
         id: "pc4",
-        text: "밤 티라미수의 촉촉한 식감이 좋고 디저트로 딱이에요. 이 가격에 이 퀄리티면 정말 가성비 최고!",
-        date: new Date("2023-05-03T12:45:00"),
+        text: "밤티라미수 후기 한입 먹었을 땐 오 맛있는데?",
+        date: new Date("2023-10-03T12:45:00"),
         sentiment: "positive" as const,
-        source: "틱톡" as const
+        source: "인스티즈" as const
       },
       {
         id: "pc5",
-        text: "영상에서 본 것처럼 정말 맛있어요! 밤향이 진하고 크림이 부드러워서 완전 만족합니다.",
-        date: new Date("2023-05-08T11:20:00"),
+        text: "편의점디저트 늘 기대이하였는데 얘는 맛있다!!	",
+        date: new Date("2023-10-08T11:20:00"),
         sentiment: "positive" as const,
-        source: "유튜브" as const
+        source: "인스티즈" as const
       },
-      {
-        id: "pc6",
-        text: "틱톡에서 유명한 이유를 알겠어요. 정말 달콤하고 예쁘게 생겼네요!",
-        date: new Date("2023-05-09T15:30:00"),
-        sentiment: "positive" as const,
-        source: "틱톡" as const
-      }
     ];
 
     const allNegativeComments = [
       {
         id: "nc1",
-        text: "밤 티라미수는 처음엔 맛있었는데 너무 달아서 금방 질려요. 절반만 먹고 나머지는 버렸네요.",
-        date: new Date("2023-05-05T19:47:00"),
+        text: "떼랑 먹는데 아메리카노랑 먹어야될듯맛피아 인스타보니 달기 줄이고 그래놀라 식감개선하겠다던데...",
+        date: new Date("2023-10-05T19:47:00"),
         sentiment: "negative" as const,
         source: "인스티즈" as const
       },
       {
         id: "nc2",
-        text: "밤 티라미수에서 인공적인 밤 맛이 느껴져서 아쉬웠어요. 자연스러운 밤 맛이 아니라 인공향 같아요.",
-        date: new Date("2023-05-03T11:08:00"),
+        text: "매장에 재고가 있나포켓씨유로 보니까 매장졀 재고에는 상품 이름조차 안 뜨길래ㅠㅠㅠ",
+        date: new Date("2023-10-03T11:08:00"),
         sentiment: "negative" as const,
-        source: "유튜브" as const
+        source: "인스티즈" as const
       },
       {
         id: "nc3",
-        text: "밤 티라미수는 가격에 비해 양이 너무 적어요. 이 가격이면 좀 더 푸짐했으면 좋겠어요.",
-        date: new Date("2023-05-02T15:30:00"),
+        text: "씨유 밤티라미수 리뉴얼 되고나서 왜 칼로리가 더 높아졌을까",
+        date: new Date("2023-10-02T15:30:00"),
         sentiment: "negative" as const,
-        source: "틱톡" as const
+        source: "인스티즈" as const
       },
       {
         id: "nc4",
-        text: "밤 티라미수가 너무 느끼하고 단맛만 강해요. 밤의 고소함이 전혀 안 느껴져서 실망했어요.",
-        date: new Date("2023-04-29T10:15:00"),
+        text: "너무 느끼해요..ㅠㅠ",
+        date: new Date("2023-10-29T10:15:00"),
         sentiment: "negative" as const,
         source: "인스티즈" as const
       },
       {
         id: "nc5",
-        text: "영상에서 본 것과 실제가 너무 달라요. 과대광고 같아서 실망스럽네요.",
+        text: "리뉴얼이 확실히 돼야할듯.",
         date: new Date("2023-05-01T13:25:00"),
         sentiment: "negative" as const,
-        source: "유튜브" as const
+        source: "인스티즈" as const
       },
       {
         id: "nc6",
-        text: "SNS용으로는 예쁘지만 맛은 그냥 그래요. 너무 달기만 해요.",
+        text: "	씨유 밤티라미수 먹었는데 엄..",
         date: new Date("2023-05-07T16:40:00"),
         sentiment: "negative" as const,
-        source: "틱톡" as const
+        source: "인스티즈" as const
       }
     ];
 

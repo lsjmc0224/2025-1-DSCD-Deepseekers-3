@@ -4,7 +4,6 @@ from app.core.db import Base
 class InstizPosts(Base):
     __tablename__ = "instiz_posts"
     id = Column(Integer, primary_key=True, autoincrement=True, comment="게시글 고유 ID")
-    keyword_id = Column(Integer, ForeignKey("keywords.id"), comment="키워드 ID")
     content = Column(Text, comment="게시글 내용")
     view_count = Column(Integer, comment="조회수")
     like_count = Column(Integer, comment="좋아요 수")
