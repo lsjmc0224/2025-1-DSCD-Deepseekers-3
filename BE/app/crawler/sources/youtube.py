@@ -18,7 +18,6 @@ class YouTubeCrawler:
         self.youtube = self.get_youtube_client(self.api_key)
 
     def _is_valid_korean_content(self, text: str) -> bool:
-        _emoji_pattern = emoji.get_emoji_regexp()
 
         if any(kw in text for kw in ("레시피", "만들기")):
             return False
