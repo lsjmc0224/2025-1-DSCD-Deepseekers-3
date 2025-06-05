@@ -45,7 +45,7 @@ class AnalysisRepository:
     def finish_analysis_log(self, log_id: int):
         log = self.db.query(AnalysisLogs).filter_by(id=log_id).first()
         if log:
-            log.finished_at = datetime.utcnow()
+            log.finished_at = datetime.now()
             self.db.commit()
 
     # ✅ 분석 결과 다건 저장
