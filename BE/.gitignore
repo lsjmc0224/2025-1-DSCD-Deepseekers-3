@@ -175,3 +175,11 @@ alembic/versions/
 # System
 .DS_Store
 Thumbs.db
+
+asset/kcelectra-base-DC/
+asset/data
+asset/source
+*.h5
+*.bin
+*.zip
+.idea/
