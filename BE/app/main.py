@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.api_router import router as api_router
+from app.api.api_router import router as api_router
 
 app = FastAPI(
     title="Analysis Backend API",

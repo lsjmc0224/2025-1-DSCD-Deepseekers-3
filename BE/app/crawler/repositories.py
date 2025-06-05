@@ -91,7 +91,6 @@ class CrawlingRepository:
             if not existing_video:
                 new_video = TiktokVideos(
                     id=video_id,
-                    keyword_id=keyword_id,  # 최초 수집 키워드 기록용
                     title=video["title"],
                     video_url=video["video_url"],
                     collected_at=collected_at,

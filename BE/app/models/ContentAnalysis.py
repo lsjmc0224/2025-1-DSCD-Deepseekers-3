@@ -8,6 +8,6 @@ class ContentAnalysis(Base):
     source_type = Column(Text, comment="분석 대상 소스 타입 (예: youtube, instiz, tiktok 등)")
     source_id = Column(Text, comment="분석 대상 소스의 고유 ID")
     sentence = Column(Text, comment="분석 문장")
-    aspect_id = Column(Integer, ForeignKey("aspects.id"), comment="속성 ID")
-    sentiment_id = Column(Integer, ForeignKey("sentiments.id"), comment="감성 ID")
+    aspect_id = Column(Integer, ForeignKey("aspects.id", ondelete="CASCADE"), comment="속성 ID")
+    sentiment_id = Column(Integer, ForeignKey("sentiments.id", ondelete="CASCADE"), comment="감성 ID")
     evidence_keywords = Column(Text, comment="근거 키워드") 

@@ -4,7 +4,6 @@ from datetime import datetime
 
 class SearchQuery(BaseModel):
     keyword: str
-    filters: Optional[dict] = None
 
 class SearchResult(BaseModel):
     keyword: str
