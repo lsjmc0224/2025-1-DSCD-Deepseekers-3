@@ -71,6 +71,11 @@ class YouTubeCrawler:
             channel_id = snippet["channelId"]
             published_at = snippet["publishedAt"]
             title = snippet.get("title", "").strip()
+
+            # ✅ 타이틀이 유효한 한국어 콘텐츠인지 확인
+            if not self._is_valid_korean_content(title):
+                continue
+
             thumbnail_url = snippet.get("thumbnails", {}).get("high", {}).get("url", "")
 
             # 상세 정보 요청
