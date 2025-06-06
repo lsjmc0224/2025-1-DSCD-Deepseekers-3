@@ -1,13 +1,11 @@
-
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import SummaryTab from '../components/dashboard/tabs/SummaryTab';
 import SentimentTab from '../components/dashboard/tabs/SentimentTab';
 import CommentsTab from '../components/dashboard/tabs/CommentsTab';
 import VideosTab from '../components/dashboard/tabs/VideosTab';
 import DashboardFilters from '../components/dashboard/DashboardFilters';
-import { useState } from 'react';
 
 interface DateRange {
   from: Date;
@@ -16,7 +14,7 @@ interface DateRange {
 
 const Index = () => {
   const location = useLocation();
-  const currentPath = location.pathname;
+  const { keyword } = useParams<{ keyword: string }>(); // ← URL 파라미터에서 키워드 가져오기
 
   const [selectedChannel, setSelectedChannel] = useState("전체");
   const [selectedPeriod, setSelectedPeriod] = useState("최근 7일");
@@ -37,41 +35,31 @@ const Index = () => {
     setSelectedDateRange(dateRange);
   };
 
-  // Do not show channel filter on videos tab
-  const showChannelFilter = currentPath !== '/videos';
+  // 현재 경로에 따라 탭 판별
+  const currentPath = location.pathname;
+  const isSummary = currentPath.startsWith('/summary');
+  const isSentiment = currentPath.startsWith('/sentiment');
+  const isComments = currentPath.startsWith('/comments');
+  const isVideos = currentPath.startsWith('/videos');
+
+  // '영상' 탭에서는 채널 필터 숨김
+  const showChannelFilter = !isVideos;
 
   const renderTabContent = () => {
-    switch (currentPath) {
-      case '/summary':
-        return <SummaryTab 
-          channel={selectedChannel}
-          period={selectedPeriod}
-          dateRange={selectedDateRange}
-        />;
-      case '/sentiment':
-        return <SentimentTab 
-          channel={selectedChannel}
-          period={selectedPeriod}
-          dateRange={selectedDateRange}
-        />;
-      case '/comments':
-        return <CommentsTab 
-          channel={selectedChannel}
-          period={selectedPeriod}
-          dateRange={selectedDateRange}
-        />;
-      case '/videos':
-        return <VideosTab 
-          channel={selectedChannel}
-          period={selectedPeriod}
-          dateRange={selectedDateRange}
-        />;
-      default:
-        return <SummaryTab 
-          channel={selectedChannel}
-          period={selectedPeriod}
-          dateRange={selectedDateRange}
-        />;
+    if (!keyword) {
+      return <div className="text-center text-gray-500">검색 키워드가 없습니다.</div>;
+    }
+
+    if (isSummary) {
+      return <SummaryTab keyword={keyword} channel={selectedChannel} period={selectedPeriod} dateRange={selectedDateRange} />;
+    } else if (isSentiment) {
+      return <SentimentTab keyword={keyword} channel={selectedChannel} period={selectedPeriod} dateRange={selectedDateRange} />;
+    } else if (isComments) {
+      return <CommentsTab keyword={keyword} channel={selectedChannel} period={selectedPeriod} dateRange={selectedDateRange} />;
+    } else if (isVideos) {
+      return <VideosTab keyword={keyword} channel={selectedChannel} period={selectedPeriod} dateRange={selectedDateRange} />;
+    } else {
+      return <SummaryTab keyword={keyword} channel={selectedChannel} period={selectedPeriod} dateRange={selectedDateRange} />;
     }
   };
 
@@ -84,7 +72,6 @@ const Index = () => {
           onDateChange={handleDateChange}
           showChannelFilter={showChannelFilter}
         />
-
         <div>
           {renderTabContent()}
         </div>
