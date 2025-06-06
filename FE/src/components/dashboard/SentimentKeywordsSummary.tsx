@@ -1,19 +1,12 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-interface Keyword {
-  text: string;
-  size: "xs" | "sm" | "md" | "lg" | "xl";
-  type: "positive" | "negative" | "neutral";
-}
-
 interface SentimentKeywordsSummaryProps {
   title: string;
   description: string;
-  keywords: Keyword[];
+  keywords: string[];  // ✅ string[]로 변경
 }
 
 const SentimentKeywordsSummary: React.FC<SentimentKeywordsSummaryProps> = ({
@@ -21,7 +14,9 @@ const SentimentKeywordsSummary: React.FC<SentimentKeywordsSummaryProps> = ({
   description,
   keywords
 }) => {
-  const getSize = (size: string) => {
+  const sizeLevels = ["xl", "lg", "md", "sm", "xs"] as const;
+
+  const getSizeClass = (size: typeof sizeLevels[number]) => {
     switch (size) {
       case "xs": return "text-xs";
       case "sm": return "text-sm";
@@ -32,14 +27,29 @@ const SentimentKeywordsSummary: React.FC<SentimentKeywordsSummaryProps> = ({
     }
   };
 
-  const getType = (type: string) => {
-    switch (type) {
-      case "positive": return "bg-green-100 text-green-800 hover:bg-green-200 border-[#4CAF50]";
-      case "negative": return "bg-red-100 text-red-800 hover:bg-red-200 border-[#F06292]";
-      case "neutral": return "bg-blue-100 text-blue-800 hover:bg-blue-200";
-      default: return "";
-    }
+  const typeStyle = title.includes("긍정")
+    ? "bg-green-100 text-green-800 hover:bg-green-200 border-[#4CAF50]"
+    : "bg-red-100 text-red-800 hover:bg-red-200 border-[#F06292]";
+
+  const generateSizedKeywords = () => {
+    const total = keywords.length;
+    if (total === 0) return [];
+
+    return keywords.map((text, index) => {
+      const ratio = index / total;
+      let size: typeof sizeLevels[number];
+
+      if (ratio < 0.2) size = "xl";
+      else if (ratio < 0.4) size = "lg";
+      else if (ratio < 0.6) size = "md";
+      else if (ratio < 0.8) size = "sm";
+      else size = "xs";
+
+      return { text, size };
+    });
   };
+
+  const sizedKeywords = generateSizedKeywords();
 
   return (
     <Card className={cn(
@@ -52,17 +62,17 @@ const SentimentKeywordsSummary: React.FC<SentimentKeywordsSummaryProps> = ({
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap gap-2">
-          {keywords.map((keyword, index) => (
+          {sizedKeywords.map((kw, index) => (
             <Badge
               key={index}
               variant="outline"
               className={cn(
                 "px-2 py-1 rounded-full font-normal border",
-                getSize(keyword.size),
-                getType(keyword.type)
+                getSizeClass(kw.size),
+                typeStyle
               )}
             >
-              {keyword.text}
+              {kw.text}
             </Badge>
           ))}
         </div>

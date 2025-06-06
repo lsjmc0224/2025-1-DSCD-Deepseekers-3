@@ -1,3 +1,4 @@
+import { Comment } from './tabs/CommentsTab'; // 상대 경로는 실제 위치에 따라 조정
 
 import React from 'react';
 import {
@@ -14,16 +15,6 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Search } from "lucide-react";
-
-interface Comment {
-  id: string;
-  text: string;
-  date: Date;
-  sentiment: "positive" | "negative" | "neutral";
-  source: "유튜브" | "커뮤니티" | "틱톡";
-  attributes: string[];
-  likes: number;
-}
 
 interface CommentsTableProps {
   comments: Comment[];
@@ -96,7 +87,9 @@ const CommentsTable: React.FC<CommentsTableProps> = ({ comments, onViewDetails }
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell>{comment.likes}</TableCell>
+                  <TableCell>
+                      {comment.likes !== null ? comment.likes : "-"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
