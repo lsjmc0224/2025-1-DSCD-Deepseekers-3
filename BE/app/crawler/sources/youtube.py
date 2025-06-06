@@ -126,6 +126,7 @@ class YouTubeCrawler:
                     "keyword_id": keyword.id,
                     "content": snippet.get("textDisplay", ""),
                     "created_at": snippet.get("publishedAt"),
+                    "like_count": snippet.get("likeCount")
                 })
                 fetched += 1
                 if fetched >= max_comments:
