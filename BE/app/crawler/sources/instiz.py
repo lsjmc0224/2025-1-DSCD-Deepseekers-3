@@ -29,7 +29,7 @@ class InstizCrawler:
         results = []
         base_url = "https://www.instiz.net"
         encoded_keyword = urllib.parse.quote(keyword.keyword, safe='')
-        now_year = datetime.datetime.now().year
+        start_date = datetime.datetime.strptime(starttime, "%Y%m%d")
         collected_time = datetime.datetime.utcnow()
 
         for page in range(1, 100):
@@ -61,14 +61,27 @@ class InstizCrawler:
                     # 날짜 파싱
                     time_cell = row.select_one('td.listno.regdate')
                     if time_cell:
-                        timestr = time_cell.get_text(strip=True)
-                        full_time = f"{now_year}.{timestr}"
+                        timestr = time_cell.get_text(strip=True)  # 예: "10.30 23:58" 또는 "10.30"
                         try:
-                            parsed_time = pd.to_datetime(full_time, format="%Y.%m.%d %H:%M")
+                            # 일단 현재 연도 기준으로 파싱
+                            tmp_datetime = pd.to_datetime(f"{start_date.year}.{timestr}", format="%Y.%m.%d %H:%M", errors="coerce")
+                            if tmp_datetime is None or pd.isna(tmp_datetime):
+                                tmp_datetime = pd.to_datetime(f"{start_date.year}.{timestr}", format="%Y.%m.%d", errors="coerce")
                         except:
-                            parsed_time = pd.to_datetime(full_time, format="%Y.%m.%d")
+                            tmp_datetime = None
+
+                        if tmp_datetime:
+                            # 연도 보정: start_date 기준으로 가장 가까운 연도 선택
+                            candidates = [
+                                tmp_datetime.replace(year=start_date.year - 1),
+                                tmp_datetime.replace(year=start_date.year),
+                                tmp_datetime.replace(year=start_date.year + 1),
+                            ]
+                            parsed_time = min(candidates, key=lambda d: abs((d - start_date).days))
+                        else:
+                            parsed_time = start_date  # fallback
                     else:
-                        parsed_time = datetime.datetime.now()
+                        parsed_time = start_date  # fallback
 
                     # 조회수, 추천수
                     listnos = row.select('td.listno')

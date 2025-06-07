@@ -1,22 +1,24 @@
 from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
+from typing import List, Optional
 
-class VideoBase(BaseModel):
-    video_id: str
-    title: str
-    channel_id: str
-    channel_title: str
-    view_count: int
-    like_count: int
-    comment_count: int
-    published_at: datetime
-    sentiment_score: float
 
-class Video(VideoBase):
-    duration: str
-    description: Optional[str]
-    tags: Optional[list[str]]
+class VideoSentiment(BaseModel):
+    positive: int
+    negative: int
+    neutral: int
 
-class ShortVideo(VideoBase):
-    pass 
+
+class VideoItem(BaseModel):
+    id: str
+    title: Optional[str]
+    thumbnail_url: Optional[str]
+    views: int
+    likes: int
+    comments: int
+    publish_date: str
+    is_short: bool
+    sentiments: VideoSentiment
+
+
+class VideoListResponse(BaseModel):
+    videos: List[VideoItem]

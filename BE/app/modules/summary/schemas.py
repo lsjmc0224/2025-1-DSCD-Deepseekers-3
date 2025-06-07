@@ -1,22 +1,30 @@
 from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
+from typing import List, Dict
 
-class WeeklyChange(BaseModel):
-    week_start: datetime
-    week_end: datetime
-    change_percentage: float
-    platform: str
 
-class DailyStats(BaseModel):
-    date: datetime
-    total_comments: int
-    positive_comments: int
-    negative_comments: int
-    neutral_comments: int
+class SummaryChange(BaseModel):
+    positive_change: str  # e.g., "+1.23%"
+    positive_delta: str   # e.g., "0.42%"
+    negative_change: str  # e.g., "-0.18%"
+    negative_delta: str   # e.g., "0.06%"
+    total_change: str     # e.g., "+38"
+    total_delta: str      # e.g., "1.58%"
 
-class PlatformSentiment(BaseModel):
-    platform: str
-    positive_percentage: float
-    negative_percentage: float
-    neutral_percentage: float 
+
+class SentimentDistributionItem(BaseModel):
+    positive: int
+    neutral: int
+    negative: int
+
+
+class SentimentTrendItem(BaseModel):
+    date: str  # e.g., "2024-10-01"
+    positive: int
+    neutral: int
+    negative: int
+
+
+class SummaryOverviewResponse(BaseModel):
+    summary_change: SummaryChange
+    sentiment_distribution: Dict[str, SentimentDistributionItem]
+    sentiment_trend: List[SentimentTrendItem]
