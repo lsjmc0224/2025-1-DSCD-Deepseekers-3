@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,8 @@ const Home = () => {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      navigate(`/summary?query=${encodeURIComponent(searchQuery.trim())}`);
+      const encodedKeyword = encodeURIComponent(searchQuery.trim());
+      navigate(`/summary/${encodedKeyword}`);
     }
   };
 

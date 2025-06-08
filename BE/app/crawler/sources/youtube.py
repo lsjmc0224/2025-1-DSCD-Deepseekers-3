@@ -71,12 +71,18 @@ class YouTubeCrawler:
             channel_id = snippet["channelId"]
             published_at = snippet["publishedAt"]
             title = snippet.get("title", "").strip()
-
+            thumbnails = snippet.get("thumbnails", {})
+            thumbnail_url = (
+                thumbnails.get("maxres", {}).get("url") or
+                thumbnails.get("standard", {}).get("url") or
+                thumbnails.get("high", {}).get("url") or
+                thumbnails.get("medium", {}).get("url") or
+                thumbnails.get("default", {}).get("url") or
+                ""
+            )
             # ✅ 타이틀이 유효한 한국어 콘텐츠인지 확인
             if not self._is_valid_korean_content(title):
                 continue
-
-            thumbnail_url = snippet.get("thumbnails", {}).get("high", {}).get("url", "")
 
             # 상세 정보 요청
             video_detail = self.youtube.videos().list(part="statistics,snippet", id=video_id).execute()
@@ -126,6 +132,7 @@ class YouTubeCrawler:
                     "keyword_id": keyword.id,
                     "content": snippet.get("textDisplay", ""),
                     "created_at": snippet.get("publishedAt"),
+                    "like_count": snippet.get("likeCount")
                 })
                 fetched += 1
                 if fetched >= max_comments:
@@ -152,7 +159,7 @@ class YouTubeCrawler:
     async def crawl(
         self,
         keyword: Keywords,
-        max_videos: int = 5,
+        max_videos: int = 20,
         max_comments: int = 100,
         published_after: Optional[str] = None,
         published_before: Optional[str] = None,
@@ -174,8 +181,16 @@ class YouTubeCrawler:
                 all_videos.append(video)
                 channel_ids.add(video["channel_id"])
 
-                comments = self.get_video_comments(keyword, video["id"], max_comments=max_comments)
-                all_comments.extend(comments)
+                try:
+                    comments = self.get_video_comments(keyword, video["id"], max_comments=max_comments)
+                    all_comments.extend(comments)
+                except Exception as e:
+                    if 'commentsDisabled' in str(e):
+                        print(f"[SKIP] 댓글이 비활성화된 영상: {video['id']}")
+                        continue  # 건너뛰기
+                    else:
+                        print(f"[ERROR] 댓글 수집 중 오류 발생 (video_id={video['id']}): {e}")
+                        continue
 
         channels = [self.get_channel_info(cid) for cid in channel_ids]
 

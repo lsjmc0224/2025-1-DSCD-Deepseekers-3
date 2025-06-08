@@ -1,4 +1,4 @@
-
+import { Comment } from './tabs/CommentsTab';
 import React from 'react';
 import {
   Dialog,
@@ -12,17 +12,6 @@ import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-interface Comment {
-  id: string;
-  text: string;
-  date: Date;
-  sentiment: "positive" | "negative" | "neutral";
-  source: "유튜브" | "커뮤니티" | "틱톡";
-  attributes: string[];
-  likes: number;
-  analysis?: Record<string, any>;
-}
 
 interface CommentDetailsProps {
   comment: Comment | null;

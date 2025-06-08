@@ -1,4 +1,3 @@
-
 import React from 'react';
 import VideoCard from './VideoCard';
 import { 
@@ -12,17 +11,17 @@ import {
 interface Video {
   id: string;
   title: string;
-  thumbnailUrl: string;
+  thumbnail_url: string;
   views: number;
   likes: number;
   comments: number;
-  publishDate: Date;
+  publish_date: string; // ISO string
   sentiments: {
     positive: number;
     negative: number;
     neutral: number;
   };
-  isShort: boolean;
+  is_short: boolean;
 }
 
 interface VideosGridProps {
@@ -33,7 +32,7 @@ interface VideosGridProps {
 
 const VideosGrid: React.FC<VideosGridProps> = ({ title, videos, isShorts }) => {
   const [sorting, setSorting] = React.useState<string>("views");
-  
+
   const sortedVideos = [...videos].sort((a, b) => {
     switch (sorting) {
       case "views":
@@ -45,15 +44,15 @@ const VideosGrid: React.FC<VideosGridProps> = ({ title, videos, isShorts }) => {
       case "positiveRate": {
         const totalA = a.sentiments.positive + a.sentiments.negative + a.sentiments.neutral;
         const totalB = b.sentiments.positive + b.sentiments.negative + b.sentiments.neutral;
-        const rateA = totalA > 0 ? (a.sentiments.positive / totalA) : 0;
-        const rateB = totalB > 0 ? (b.sentiments.positive / totalB) : 0;
+        const rateA = totalA > 0 ? a.sentiments.positive / totalA : 0;
+        const rateB = totalB > 0 ? b.sentiments.positive / totalB : 0;
         return rateB - rateA;
       }
       case "negativeRate": {
         const totalA = a.sentiments.positive + a.sentiments.negative + a.sentiments.neutral;
         const totalB = b.sentiments.positive + b.sentiments.negative + b.sentiments.neutral;
-        const rateA = totalA > 0 ? (a.sentiments.negative / totalA) : 0;
-        const rateB = totalB > 0 ? (b.sentiments.negative / totalB) : 0;
+        const rateA = totalA > 0 ? a.sentiments.negative / totalA : 0;
+        const rateB = totalB > 0 ? b.sentiments.negative / totalB : 0;
         return rateB - rateA;
       }
       default:
@@ -78,16 +77,21 @@ const VideosGrid: React.FC<VideosGridProps> = ({ title, videos, isShorts }) => {
           </SelectContent>
         </Select>
       </div>
-      
-      <div className={`grid gap-4 ${
-        isShorts 
-          ? 'grid-auto-fit grid-cols-[repeat(auto-fit,minmax(140px,1fr))] sm:grid-cols-[repeat(auto-fit,minmax(140px,1fr))] md:grid-cols-[repeat(auto-fit,minmax(160px,1fr))] lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]' 
-          : 'grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))]'
-      }`}>
-        {sortedVideos.map((video) => (
-          <VideoCard key={video.id} video={video} />
-        ))}
-      </div>
+
+      {sortedVideos.length === 0 ? (
+        <p className="text-center text-sm text-muted-foreground py-8">
+          해당 기간을 기준으로 수집된 영상이 없습니다.
+        </p>
+      ) : (
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {sortedVideos.map((video) => (
+            <VideoCard 
+              key={video.id} 
+              video={video} 
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

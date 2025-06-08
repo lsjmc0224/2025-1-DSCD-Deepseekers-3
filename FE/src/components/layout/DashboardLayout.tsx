@@ -12,7 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import Header from './Header';
 import { BarChart3, MessagesSquare, Smile, Video, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useParams } from "react-router-dom";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -23,12 +23,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const path = location.pathname;
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const { keyword } = useParams<{ keyword: string }>();
 
   const navItems = [
-    { label: '통합요약', icon: BarChart3, path: '/summary' },
-    { label: '감성분석', icon: Smile, path: '/sentiment' },
-    { label: '댓글 분석기', icon: MessagesSquare, path: '/comments' },
-    { label: '영상모니터링', icon: Video, path: '/videos' },
+    { label: '통합요약', icon: BarChart3, path: `/summary${keyword ? `/${encodeURIComponent(keyword)}` : ''}` },
+    { label: '감성분석', icon: Smile, path: `/sentiment${keyword ? `/${encodeURIComponent(keyword)}` : ''}` },
+    { label: '댓글 분석기', icon: MessagesSquare, path: `/comments${keyword ? `/${encodeURIComponent(keyword)}` : ''}` },
+    { label: '영상모니터링', icon: Video, path: `/videos${keyword ? `/${encodeURIComponent(keyword)}` : ''}` },
   ];
 
   const getNavCls = (itemPath: string) => {

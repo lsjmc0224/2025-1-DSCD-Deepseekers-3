@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 const App = () => {
   // 타이틀 변경
   useEffect(() => {
-    document.title = "밤 티라미수 데이터 분석 대시보드";
+    document.title = "SNATCH";
   }, []);
 
   return (
@@ -27,11 +27,10 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/summary" element={<Index />} />
-              <Route path="/sentiment" element={<Index />} />
-              <Route path="/comments" element={<Index />} />
-              <Route path="/videos" element={<Index />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/summary/:keyword" element={<Index />} />
+              <Route path="/sentiment/:keyword" element={<Index />} />
+              <Route path="/comments/:keyword" element={<Index />} />
+              <Route path="/videos/:keyword" element={<Index />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

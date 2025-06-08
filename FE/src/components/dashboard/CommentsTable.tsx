@@ -1,3 +1,4 @@
+import { Comment } from './tabs/CommentsTab'; // 상대 경로는 실제 위치에 따라 조정
 
 import React from 'react';
 import {
@@ -14,16 +15,6 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Search } from "lucide-react";
-
-interface Comment {
-  id: string;
-  text: string;
-  date: Date;
-  sentiment: "positive" | "negative" | "neutral";
-  source: "유튜브" | "커뮤니티" | "틱톡";
-  attributes: string[];
-  likes: number;
-}
 
 interface CommentsTableProps {
   comments: Comment[];
@@ -74,9 +65,22 @@ const CommentsTable: React.FC<CommentsTableProps> = ({ comments, onViewDetails }
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium">
-                    {comment.text.length > 50 
-                      ? `${comment.text.substring(0, 50)}...` 
-                      : comment.text}
+                    {comment.post_url ? (
+                      <a
+                        href={comment.post_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {comment.text.length > 50 
+                          ? `${comment.text.substring(0, 50)}...` 
+                          : comment.text}
+                      </a>
+                    ) : (
+                      comment.text.length > 50 
+                        ? `${comment.text.substring(0, 50)}...` 
+                        : comment.text
+                    )}
                   </TableCell>
                   <TableCell>
                     {format(comment.date, "yyyy.MM.dd", { locale: ko })}
@@ -96,7 +100,9 @@ const CommentsTable: React.FC<CommentsTableProps> = ({ comments, onViewDetails }
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell>{comment.likes}</TableCell>
+                  <TableCell>
+                      {comment.likes !== null ? comment.likes : "-"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"

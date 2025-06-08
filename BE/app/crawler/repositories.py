@@ -143,7 +143,8 @@ class CrawlingRepository:
                     parent_comment_id=comment["parent_comment_id"],
                     is_reply=comment["is_reply"],
                     created_at=comment["created_at"],
-                    is_analyzed=False
+                    is_analyzed=False,
+                    collected_at=comment["collected_at"]
                 )
                 self.db.add(new_comment)
                 saved_comments += 1
@@ -251,6 +252,7 @@ class CrawlingRepository:
                 video_id = c["video_id"]
                 keyword_id = c["keyword_id"]
                 created_at = c["created_at"]
+                like_count = c["like_count"]
 
                 existing_comment = self.db.query(YoutubeComments).filter_by(id=comment_id).first()
                 if not existing_comment:
@@ -259,7 +261,8 @@ class CrawlingRepository:
                         video_id=video_id,
                         content=c["content"],
                         created_at=created_at,
-                        is_analyzed=False
+                        is_analyzed=False,
+                        like_count=like_count
                     )
                     self.db.add(new_comment)
                     self.db.flush()

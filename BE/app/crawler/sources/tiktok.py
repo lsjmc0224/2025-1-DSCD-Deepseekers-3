@@ -52,7 +52,7 @@ class TikTokCrawler:
         all_comments = []
 
         scroll_count = 0
-        MAX_ITEMS = 10
+        MAX_ITEMS = 50
         WAIT = 2
 
         def click_more_results_if_available():
@@ -96,7 +96,7 @@ class TikTokCrawler:
 
                         # ✅ 댓글 수집
                         print(f"[LOG] 댓글 수집 중: {video_id}")
-                        comments = await self.crawl_comments(video_id)
+                        comments = await self.crawl_comments(video_id, keyword.id)
                         all_comments.extend(comments)
 
                     if len(videos) >= MAX_ITEMS:
@@ -117,7 +117,7 @@ class TikTokCrawler:
         }
 
 
-    async def crawl_comments(self, video_id: str) -> List[Dict[str, Any]]:
+    async def crawl_comments(self, video_id: str, keyword_id: int) -> List[Dict[str, Any]]:
         """
         특정 TikTok 비디오의 댓글 및 답글을 크롤링하여 TiktokComments 모델에 맞는 dict 리스트로 반환합니다.
         :param video_id: TikTok 비디오 ID
@@ -144,25 +144,29 @@ class TikTokCrawler:
                 results.append({
                     "id": comment.comment_id,
                     "video_id": video_id,
+                    "keyword_id": keyword_id, 
                     "content": comment.comment,
                     "reply_count": comment.total_reply,
                     "user_id": comment.username,
                     "nickname": comment.nickname,
                     "parent_comment_id": None,
                     "is_reply": False,
-                    "created_at": format_time(comment.create_time)
+                    "created_at": format_time(comment.create_time),
+                    "collected_at": datetime.now()
                 })
                 for reply in comment.replies:
                     results.append({
                         "id": reply.comment_id,
                         "video_id": video_id,
+                        "keyword_id": keyword_id,
                         "content": reply.comment,
                         "reply_count": reply.total_reply,
                         "user_id": reply.username,
                         "nickname": reply.nickname,
                         "parent_comment_id": comment.comment_id,
                         "is_reply": True,
-                        "created_at": format_time(reply.create_time)
+                        "created_at": format_time(reply.create_time),
+                        "collected_at": datetime.now()
                     })
         except Exception:
             pass

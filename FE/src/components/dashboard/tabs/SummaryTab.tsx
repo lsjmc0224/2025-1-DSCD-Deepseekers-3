@@ -1,7 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import SentimentSummaryCard from '../SentimentSummaryCard';
 import SentimentTrendChart from '../charts/SentimentTrendChart';
 import SentimentDonutChart from '../charts/SentimentDonutChart';
+import { Loader2 } from 'lucide-react';
 
 interface DateRange {
   from: Date;
@@ -14,285 +17,178 @@ interface SummaryTabProps {
   dateRange: DateRange;
 }
 
+interface SentimentCounts {
+  positive: number;
+  neutral: number;
+  negative: number;
+}
+
+const SENTIMENT_COLORS = {
+  positive: "#A0E8AF",
+  negative: "#F28B82",
+  neutral: "#9FA8DA",
+};
+
 const SummaryTab: React.FC<SummaryTabProps> = ({ channel, period, dateRange }) => {
-  // Define consistent color palette for all charts
-  const SENTIMENT_COLORS = {
-    positive: "#A0E8AF",  // Light Green
-    negative: "#F28B82",  // Soft Red
-    neutral: "#9FA8DA",   // Purple
-    total: "#D1C4E9"      // Light Purple for total line
-  };
-  
-  // Platform-specific percentages and totals based on channel filter
-  const getPlatformData = useMemo(() => {
-    const baseTotals = {
-      youtube: 50,
-      tiktok: 50,
-      instiz: 50, // Changed from community to instiz
-      overall: 150
-    };
+  const { keyword } = useParams<{ keyword: string }>();
 
-    // Adjust totals based on period
-    const periodMultiplier = {
-      "최근 7일": 0.1,
-      "최근 14일": 0.18,
-      "최근 30일": 0.35,
-      "사용자 지정": 0.2 // Default multiplier for custom range
-    };
+  const [summaryData, setSummaryData] = useState<any | null>(null);
+  const [loading, setLoading] = useState(false);
 
-    const multiplier = periodMultiplier[period as keyof typeof periodMultiplier] || 1;
-    
-    const adjustedTotals = {
-      youtube: Math.round(baseTotals.youtube * multiplier),
-      tiktok: Math.round(baseTotals.tiktok * multiplier),
-      instiz: Math.round(baseTotals.instiz * multiplier),
-      overall: Math.round(baseTotals.overall * multiplier)
-    };
+  useEffect(() => {
+    if (!keyword) return;
 
-    const platformPercentages = {
-      youtube: {
-        positive: 65,
-        neutral: 20,
-        negative: 15
-      },
-      tiktok: {
-        positive: 40,
-        neutral: 30,
-        negative: 30
-      },
-      instiz: {
-        positive: 20,
-        neutral: 25,
-        negative: 55
-      }
-    };
-
-    return { adjustedTotals, platformPercentages };
-  }, [channel, period]);
-
-  // Calculate counts for each platform
-  const calculateCounts = (percentages: { positive: number, neutral: number, negative: number }, totalCount: number) => {
-    return {
-      positive: Math.round((percentages.positive / 100) * totalCount),
-      neutral: Math.round((percentages.neutral / 100) * totalCount),
-      negative: Math.round((percentages.negative / 100) * totalCount)
-    };
-  };
-
-  const { adjustedTotals, platformPercentages } = getPlatformData;
-  
-  const youtubeCounts = calculateCounts(platformPercentages.youtube, adjustedTotals.youtube);
-  const tiktokCounts = calculateCounts(platformPercentages.tiktok, adjustedTotals.tiktok);
-  const instizCounts = calculateCounts(platformPercentages.instiz, adjustedTotals.instiz);
-  
-  const overallCounts = {
-    positive: youtubeCounts.positive + tiktokCounts.positive + instizCounts.positive,
-    neutral: youtubeCounts.neutral + tiktokCounts.neutral + instizCounts.neutral,
-    negative: youtubeCounts.negative + tiktokCounts.negative + instizCounts.negative
-  };
-
-  // Get current platform data based on channel filter
-  const getCurrentPlatformData = useMemo(() => {
-    switch(channel) {
-      case "유튜브":
-        return {
-          counts: youtubeCounts,
-          total: adjustedTotals.youtube,
-          percentages: platformPercentages.youtube
-        };
-      case "틱톡":
-        return {
-          counts: tiktokCounts,
-          total: adjustedTotals.tiktok,
-          percentages: platformPercentages.tiktok
-        };
-      case "인스티즈":
-        return {
-          counts: instizCounts,
-          total: adjustedTotals.instiz,
-          percentages: platformPercentages.instiz
-        };
-      default: // "전체"
-        return {
-          counts: overallCounts,
-          total: adjustedTotals.overall,
-          percentages: {
-            positive: Math.round((overallCounts.positive / (overallCounts.positive + overallCounts.neutral + overallCounts.negative)) * 100),
-            neutral: Math.round((overallCounts.neutral / (overallCounts.positive + overallCounts.neutral + overallCounts.negative)) * 100),
-            negative: Math.round((overallCounts.negative / (overallCounts.positive + overallCounts.neutral + overallCounts.negative)) * 100)
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get("http://localhost:8000/summary/overview", {
+          params: {
+            product: keyword,
+            from: dateRange.from.toISOString().split("T")[0],
+            to: dateRange.to?.toISOString().split("T")[0] ?? dateRange.from.toISOString().split("T")[0]
           }
-        };
-    }
-  }, [channel, youtubeCounts, tiktokCounts, instizCounts, overallCounts, adjustedTotals, platformPercentages]);
+        });
+        setSummaryData(res.data);
+      } catch (e) {
+        console.error("요약 데이터 요청 실패", e);
 
-  // Get summary card data based on period and platform
-  const getSummaryCardData = useMemo(() => {
-    const baseData = {
-      "최근 7일": {
-        positiveChange: "+0.85%",
-        positiveDelta: "0.21%",
-        negativeChange: "-0.12%",
-        negativeDelta: "0.04%",
-        totalChange: "+24",
-        totalDelta: "1.23%"
-      },
-      "최근 14일": {
-        positiveChange: "+1.23%",
-        positiveDelta: "0.42%",
-        negativeChange: "-0.18%",
-        negativeDelta: "0.06%",
-        totalChange: "+38",
-        totalDelta: "1.58%"
-      },
-      "최근 30일": {
-        positiveChange: "+1.68%",
-        positiveDelta: "0.94%",
-        negativeChange: "-0.35%",
-        negativeDelta: "0.17%",
-        totalChange: "+52",
-        totalDelta: "2.32%"
-      },
-      "사용자 지정": {
-        positiveChange: "+1.42%",
-        positiveDelta: "0.58%",
-        negativeChange: "-0.21%",
-        negativeDelta: "0.09%",
-        totalChange: "+42",
-        totalDelta: "1.85%"
+        // ✅ fallback 더미 데이터
+        setSummaryData({
+          summary_change: {
+            positive_change: "+1.45%",
+            positive_delta: "0.38%",
+            negative_change: "-0.32%",
+            negative_delta: "0.11%",
+            total_change: "+47",
+            total_delta: "1.82%"
+          },
+          sentiment_distribution: {
+            youtube: { positive: 60, neutral: 25, negative: 15 },
+            tiktok: { positive: 35, neutral: 30, negative: 35 },
+            instiz: { positive: 20, neutral: 30, negative: 50 },
+            overall: { positive: 115, neutral: 85, negative: 100 }
+          },
+          sentiment_trend: [
+            { date: "10/01", positive: 10, neutral: 3, negative: 5 },
+            { date: "10/02", positive: 14, neutral: 5, negative: 6 },
+            { date: "10/03", positive: 12, neutral: 4, negative: 7 },
+            { date: "10/04", positive: 16, neutral: 6, negative: 5 },
+            { date: "10/05", positive: 18, neutral: 5, negative: 6 },
+            { date: "10/06", positive: 13, neutral: 4, negative: 4 },
+            { date: "10/07", positive: 15, neutral: 3, negative: 7 }
+          ]
+        });
+      } finally {
+        setLoading(false);
       }
     };
 
-    const data = baseData[period as keyof typeof baseData] || baseData["최근 7일"];
-    
-    // Adjust data based on platform
-    const platformMultiplier = {
-      "전체": 1,
-      "유튜브": 1.2,
-      "틱톡": 0.8,
-      "인스티즈": 0.6
-    };
+    fetchData();
+  }, [keyword, dateRange]);
 
-    const multiplier = platformMultiplier[channel as keyof typeof platformMultiplier] || 1;
-    
+  const getSummaryCardData = useMemo(() => {
+    if (!summaryData) return null;
+
+    const { summary_change } = summaryData;
+
     return {
-      positiveChange: data.positiveChange,
-      positiveDelta: `${(parseFloat(data.positiveDelta) * multiplier).toFixed(1)}%`,
+      positiveChange: summary_change.positive_change,
+      positiveDelta: summary_change.positive_delta,
       positiveType: "increase" as const,
-      negativeChange: data.negativeChange,
-      negativeDelta: `${(parseFloat(data.negativeDelta) * multiplier).toFixed(1)}%`,
+      negativeChange: summary_change.negative_change,
+      negativeDelta: summary_change.negative_delta,
       negativeType: "decrease" as const,
-      totalChange: `+${Math.round(parseInt(data.totalChange.replace('+', '')) * multiplier)}`,
-      totalDelta: `${(parseFloat(data.totalDelta) * multiplier).toFixed(1)}%`,
+      totalChange: summary_change.total_change,
+      totalDelta: summary_change.total_delta,
       totalType: "increase" as const
     };
-  }, [period, channel]);
-  
-  // Generate donut chart data for current platform/filter
-  const currentPlatformDonutData = useMemo(() => {
-    const { counts } = getCurrentPlatformData;
-    return [
-      { name: "긍정", value: counts.positive, color: SENTIMENT_COLORS.positive },
-      { name: "중립", value: counts.neutral, color: SENTIMENT_COLORS.neutral },
-      { name: "부정", value: counts.negative, color: SENTIMENT_COLORS.negative }
-    ];
-  }, [getCurrentPlatformData, SENTIMENT_COLORS]);
+  }, [summaryData]);
 
-  // Generate individual platform donut chart data (always show all platforms)
-  const youtubeDonutData = useMemo(() => {
-    return [
-      { name: "긍정", value: youtubeCounts.positive, color: SENTIMENT_COLORS.positive },
-      { name: "중립", value: youtubeCounts.neutral, color: SENTIMENT_COLORS.neutral },
-      { name: "부정", value: youtubeCounts.negative, color: SENTIMENT_COLORS.negative }
-    ];
-  }, [youtubeCounts, SENTIMENT_COLORS]);
 
-  const tiktokDonutData = useMemo(() => {
-    return [
-      { name: "긍정", value: tiktokCounts.positive, color: SENTIMENT_COLORS.positive },
-      { name: "중립", value: tiktokCounts.neutral, color: SENTIMENT_COLORS.neutral },
-      { name: "부정", value: tiktokCounts.negative, color: SENTIMENT_COLORS.negative }
-    ];
-  }, [tiktokCounts, SENTIMENT_COLORS]);
+  const getDonutChartData = (counts: SentimentCounts) => [
+    { name: "긍정", value: counts.positive, color: SENTIMENT_COLORS.positive },
+    { name: "중립", value: counts.neutral, color: SENTIMENT_COLORS.neutral },
+    { name: "부정", value: counts.negative, color: SENTIMENT_COLORS.negative }
+  ];
 
-  const instizDonutData = useMemo(() => {
-    return [
-      { name: "긍정", value: instizCounts.positive, color: SENTIMENT_COLORS.positive },
-      { name: "중립", value: instizCounts.neutral, color: SENTIMENT_COLORS.neutral },
-      { name: "부정", value: instizCounts.negative, color: SENTIMENT_COLORS.negative }
-    ];
-  }, [instizCounts, SENTIMENT_COLORS]);
+  const dist = summaryData?.sentiment_distribution;
+
+  const trendData = summaryData?.sentiment_trend ?? [];
+
+  const currentDist = useMemo(() => {
+    if (!dist) return { positive: 0, neutral: 0, negative: 0 };
+
+    if (channel === "유튜브") return dist.youtube;
+    if (channel === "틱톡") return dist.tiktok;
+    if (channel === "인스티즈") return dist.instiz;
+    return dist.overall;
+  }, [channel, dist]);
+
+  if (loading || !summaryData) {
+    return (
+      <div className="w-full flex justify-center items-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards - Period and Platform specific data */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <SentimentSummaryCard
-          title="긍정 언급 변화율"
-          value={getSummaryCardData.positiveChange}
-          delta={getSummaryCardData.positiveDelta}
-          deltaType={getSummaryCardData.positiveType}
+          title="긍정 언급 비율"
+          value={getSummaryCardData?.positiveChange}
+          delta={getSummaryCardData?.positiveDelta}
+          deltaType={getSummaryCardData?.positiveType}
           description="지난 기간 대비"
         />
         <SentimentSummaryCard
-          title="부정 언급 변화율"
-          value={getSummaryCardData.negativeChange}
-          delta={getSummaryCardData.negativeDelta}
-          deltaType={getSummaryCardData.negativeType}
+          title="부정 언급 비율"
+          value={getSummaryCardData?.negativeChange}
+          delta={getSummaryCardData?.negativeDelta}
+          deltaType={getSummaryCardData?.negativeType}
           description="지난 기간 대비"
         />
         <SentimentSummaryCard
-          title="총 콘텐츠 수 변화"
-          value={getSummaryCardData.totalChange}
-          delta={getSummaryCardData.totalDelta}
-          deltaType={getSummaryCardData.totalType}
+          title="수집된 콘텐츠 수"
+          value={getSummaryCardData?.totalChange}
+          delta={getSummaryCardData?.totalDelta}
+          deltaType={getSummaryCardData?.totalType}
           description="지난 기간 대비"
         />
       </div>
 
-      {/* Trend Chart - Platform and Period specific */}
-      <div className="grid grid-cols-1 gap-6">
-        <div className="col-span-1">
-          <SentimentTrendChart 
-            dateRange={dateRange} 
-            platform={channel}
-          />
-        </div>
-      </div>
+      <SentimentTrendChart
+        dateRange={dateRange}
+        platform={channel}
+        data={trendData}
+      />
 
-      {/* Current Platform/Filter Sentiment Distribution */}
-      <div className="grid grid-cols-1 gap-6">
-        <SentimentDonutChart
-          title={channel === "전체" ? "전체 감성 분포" : `${channel} 감성 분포`}
-          description={channel === "전체" ? "전체 댓글 기준 감성 비율" : `${channel} 댓글 감성 분포`}
-          data={currentPlatformDonutData}
-          showCount={true}
-        />
-      </div>
+      <SentimentDonutChart
+        title={channel === "전체" ? "전체 감성 분포" : `${channel} 감성 분포`}
+        description="선택된 채널의 댓글 감성 비율"
+        data={getDonutChartData(currentDist ?? { positive: 0, neutral: 0, negative: 0 })}
+        showCount={true}
+      />
 
-      {/* Individual Platform Charts - Always show all platforms with period-adjusted data */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <SentimentDonutChart
           title="유튜브 감성 분석"
           description="유튜브 댓글 감성 분포"
-          data={youtubeDonutData}
-          emptyMessage="유튜브 채널 데이터가 없습니다"
-          showCount={true}
+          data={getDonutChartData(dist?.youtube ?? { positive: 0, neutral: 0, negative: 0 })}
+          showCount
         />
-        
         <SentimentDonutChart
           title="틱톡 감성 분석"
           description="틱톡 댓글 감성 분포"
-          data={tiktokDonutData}
-          emptyMessage="틱톡 채널 데이터가 없습니다"
-          showCount={true}
+          data={getDonutChartData(dist?.tiktok ?? { positive: 0, neutral: 0, negative: 0 })}
+          showCount
         />
-        
         <SentimentDonutChart
           title="인스티즈 감성 분석"
-          description="온라인 커뮤니티 감성 분포"
-          data={instizDonutData}
-          emptyMessage="인스티즈 채널 데이터가 없습니다"
-          showCount={true}
+          description="커뮤니티 댓글 감성 분포"
+          data={getDonutChartData(dist?.instiz ?? { positive: 0, neutral: 0, negative: 0 })}
+          showCount
         />
       </div>
     </div>
