@@ -1,6 +1,9 @@
 # 2025-1-DSCD-Deepseekers-3
 2025-1학기 데이터사이언스연계전공 3팀 Deepseekers 레포지토리입니다.
 
+# 시연 동영상
+https://www.youtube.com/watch?v=kX44fCQQjFY
+
 ## 0. how to start (BE, DA)
 1. `python 3.12` 설치
 2. bash에서 가상환경 / 패키지 설치하기
