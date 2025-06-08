@@ -41,26 +41,18 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ channel, period, dateRange }) =
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/summary/overview", {
+        const res = await axios.get("http://localhost:8000/summary/overview", {
           params: {
             product: keyword,
             from: dateRange.from.toISOString().split("T")[0],
-            to: dateRange.to?.toISOString().split("T")[0],
-            platform:
-              channel === "전체"
-                ? "all"
-                : channel === "유튜브"
-                ? "youtube"
-                : channel === "틱톡"
-                ? "tiktok"
-                : "community"
+            to: dateRange.to?.toISOString().split("T")[0] ?? dateRange.from.toISOString().split("T")[0]
           }
         });
         setSummaryData(res.data);
       } catch (e) {
         console.error("요약 데이터 요청 실패", e);
 
-        // ✅ 더미 데이터 삽입
+        // ✅ fallback 더미 데이터
         setSummaryData({
           summary_change: {
             positive_change: "+1.45%",
@@ -92,7 +84,7 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ channel, period, dateRange }) =
     };
 
     fetchData();
-  }, [keyword, dateRange, channel]);
+  }, [keyword, dateRange]);
 
   const getSummaryCardData = useMemo(() => {
     if (!summaryData) return null;
@@ -144,21 +136,21 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ channel, period, dateRange }) =
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <SentimentSummaryCard
-          title="긍정 언급 변화율"
+          title="긍정 언급 비율"
           value={getSummaryCardData?.positiveChange}
           delta={getSummaryCardData?.positiveDelta}
           deltaType={getSummaryCardData?.positiveType}
           description="지난 기간 대비"
         />
         <SentimentSummaryCard
-          title="부정 언급 변화율"
+          title="부정 언급 비율"
           value={getSummaryCardData?.negativeChange}
           delta={getSummaryCardData?.negativeDelta}
           deltaType={getSummaryCardData?.negativeType}
           description="지난 기간 대비"
         />
         <SentimentSummaryCard
-          title="총 콘텐츠 수 변화"
+          title="수집된 콘텐츠 수"
           value={getSummaryCardData?.totalChange}
           delta={getSummaryCardData?.totalDelta}
           deltaType={getSummaryCardData?.totalType}
@@ -175,7 +167,7 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ channel, period, dateRange }) =
       <SentimentDonutChart
         title={channel === "전체" ? "전체 감성 분포" : `${channel} 감성 분포`}
         description="선택된 채널의 댓글 감성 비율"
-        data={getDonutChartData(currentDist)}
+        data={getDonutChartData(currentDist ?? { positive: 0, neutral: 0, negative: 0 })}
         showCount={true}
       />
 
@@ -183,19 +175,19 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ channel, period, dateRange }) =
         <SentimentDonutChart
           title="유튜브 감성 분석"
           description="유튜브 댓글 감성 분포"
-          data={getDonutChartData(dist.youtube)}
+          data={getDonutChartData(dist?.youtube ?? { positive: 0, neutral: 0, negative: 0 })}
           showCount
         />
         <SentimentDonutChart
           title="틱톡 감성 분석"
           description="틱톡 댓글 감성 분포"
-          data={getDonutChartData(dist.tiktok)}
+          data={getDonutChartData(dist?.tiktok ?? { positive: 0, neutral: 0, negative: 0 })}
           showCount
         />
         <SentimentDonutChart
           title="인스티즈 감성 분석"
           description="커뮤니티 댓글 감성 분포"
-          data={getDonutChartData(dist.instiz)}
+          data={getDonutChartData(dist?.instiz ?? { positive: 0, neutral: 0, negative: 0 })}
           showCount
         />
       </div>

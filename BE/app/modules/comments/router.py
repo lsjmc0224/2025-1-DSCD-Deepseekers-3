@@ -95,9 +95,10 @@ async def get_comments(
             results.append(schemas.Comment(
                 id=f"{InstizPosts.__tablename__}-{post.id}",
                 text=post.content,
+                post_url=post.post_url,
                 date=post.created_at,
                 sentiment=sentiment,
-                source="인스티즈",
+                source="커뮤니티",
                 likes=post.like_count if hasattr(post, "like_count") else None,
                 attributes=[aspect_label],
                 analysis=schemas.CommentAnalysis(
@@ -145,8 +146,9 @@ async def get_comments(
 
             results.append(schemas.Comment(
                 id=f"{TiktokComments.__tablename__}-{comment.id}",
-                text=comment.text,
+                text=comment.content,
                 date=comment.created_at,
+                post_url=comment.video_id,
                 sentiment=sentiment,
                 source="틱톡",
                 likes=comment.like_count if hasattr(comment, "like_count") else None,
@@ -196,8 +198,9 @@ async def get_comments(
 
             results.append(schemas.Comment(
                 id=f"{YoutubeComments.__tablename__}-{comment.id}",
-                text=comment.text,
+                text=comment.content,
                 date=comment.created_at,
+                post_url=f"https://www.youtube.com/watch?v={comment.video_id}",
                 sentiment=sentiment,
                 source="유튜브",
                 likes=comment.like_count if hasattr(comment, "like_count") else None,

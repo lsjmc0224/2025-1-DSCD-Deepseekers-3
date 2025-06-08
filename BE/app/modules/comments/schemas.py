@@ -13,6 +13,7 @@ class Comment(BaseModel):
     text: str
     date: datetime
     sentiment: str
+    post_url: Optional[str] = None
     source: str
     likes: Optional[int]
     attributes: List[str]

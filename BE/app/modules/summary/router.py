@@ -130,7 +130,7 @@ async def get_summary_overview(
         positive_delta=delta(pos_now, pos_prev),
         negative_change=percent(neg_now, total_now),
         negative_delta=delta(neg_now, neg_prev),
-        total_change=f"{total_now - total_prev:+}",
+        total_change=f"{total_now}개",
         total_delta=delta(total_now, total_prev)
     )
 

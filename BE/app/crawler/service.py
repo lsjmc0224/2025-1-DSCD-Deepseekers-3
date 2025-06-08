@@ -65,8 +65,8 @@ class CrawlerService:
             try:
                 yt_result = await self.youtube_crawler.crawl(
                     keyword=keyword_obj,
-                    max_videos=5,
-                    max_comments=20,
+                    max_videos=20,
+                    max_comments=100,
                     published_after=youtube_period["starttime"],
                     published_before=youtube_period["endtime"]
                 )

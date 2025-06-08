@@ -65,9 +65,22 @@ const CommentsTable: React.FC<CommentsTableProps> = ({ comments, onViewDetails }
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium">
-                    {comment.text.length > 50 
-                      ? `${comment.text.substring(0, 50)}...` 
-                      : comment.text}
+                    {comment.post_url ? (
+                      <a
+                        href={comment.post_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {comment.text.length > 50 
+                          ? `${comment.text.substring(0, 50)}...` 
+                          : comment.text}
+                      </a>
+                    ) : (
+                      comment.text.length > 50 
+                        ? `${comment.text.substring(0, 50)}...` 
+                        : comment.text
+                    )}
                   </TableCell>
                   <TableCell>
                     {format(comment.date, "yyyy.MM.dd", { locale: ko })}

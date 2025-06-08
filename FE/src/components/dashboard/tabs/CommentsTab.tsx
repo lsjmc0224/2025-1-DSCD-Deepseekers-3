@@ -33,6 +33,7 @@ export interface Comment {
   date: Date;
   sentiment: 'positive' | 'negative' | 'neutral';
   source: string;
+  post_url: string;
   likes: number | null;
   attributes: string[];
   analysis: {
@@ -48,6 +49,7 @@ const dummyComments: Comment[] = [
     date: new Date('2025-10-01'),
     sentiment: 'positive',
     source: '유튜브',
+    post_url: 'https://youtube.com/comment-1',
     likes: 12,
     attributes: ['맛'],
     analysis: {
@@ -61,6 +63,7 @@ const dummyComments: Comment[] = [
     date: new Date('2025-10-03'),
     sentiment: 'negative',
     source: '커뮤니티',
+    post_url: 'https://community.com/comment-2',
     likes: null,
     attributes: ['가격'],
     analysis: {
@@ -74,6 +77,7 @@ const dummyComments: Comment[] = [
     date: new Date('2025-10-05'),
     sentiment: 'neutral',
     source: '틱톡',
+    post_url: 'https://tiktok.com/comment-3',
     likes: 6,
     attributes: ['식감', '맛'],
     analysis: {
@@ -106,7 +110,7 @@ const CommentsTab: React.FC<CommentsTabProps> = ({ channel, period, dateRange })
     const fetchComments = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:8000/api/comments", {
+        const response = await axios.get("http://localhost:8000/comments", {
           params: {
             from: dateRange.from.toISOString().split("T")[0],
             to: dateRange.to?.toISOString().split("T")[0],

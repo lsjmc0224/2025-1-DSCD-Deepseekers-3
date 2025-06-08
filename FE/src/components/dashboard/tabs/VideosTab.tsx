@@ -10,6 +10,7 @@ interface VideosTabProps {
   channel: string;
   period: string;
   dateRange: DateRange;
+  keyword: string;
 }
 
 interface VideoItem {
@@ -146,7 +147,7 @@ const fallbackVideos: VideoItem[] = [
 ];
 
 
-const VideosTab: React.FC<VideosTabProps> = ({ channel, period, dateRange }) => {
+const VideosTab: React.FC<VideosTabProps> = ({ channel, period, dateRange, keyword }) => {
   const [shorts, setShorts] = useState<VideoItem[]>([]);
   const [longs, setLongs] = useState<VideoItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -154,19 +155,25 @@ const VideosTab: React.FC<VideosTabProps> = ({ channel, period, dateRange }) => 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const from = dateRange.from.toISOString().split('T')[0];
-        const to = dateRange.to?.toISOString().split('T')[0] ?? from;
+        const from = dateRange.from.toISOString().split("T")[0];
+        const to = dateRange.to?.toISOString().split("T")[0] ?? from;
 
-        const response = await fetch(
-          `http://localhost:8000/api/videos?product=${encodeURIComponent(channel)}&from=${from}&to=${to}&platform=youtube`
-        );
+        // ✅ 파라미터 검증 로그 추가
+        console.log("[fetchVideos] params", { keyword, from, to });
 
-        if (!response.ok) throw new Error('API 요청 실패');
+        const query = new URLSearchParams({
+          product: keyword,
+          from,
+          to,
+        }).toString();
+
+        const response = await fetch(`http://localhost:8000/youtube/videos?${query}`);
+
+        if (!response.ok) throw new Error(`API 요청 실패: ${response.status}`);
 
         const data = await response.json();
 
         if (Array.isArray(data.videos)) {
-          // 🔎 클라이언트에서도 날짜 필터링
           const filtered = data.videos.filter((v: VideoItem) => {
             const publishDate = new Date(v.publish_date);
             const fromDate = new Date(dateRange.from);
@@ -174,16 +181,13 @@ const VideosTab: React.FC<VideosTabProps> = ({ channel, period, dateRange }) => 
             return publishDate >= fromDate && publishDate <= toDate;
           });
 
-          const shorts = filtered.filter((v) => v.is_short);
-          const longs = filtered.filter((v) => !v.is_short);
-
-          setShorts(shorts);
-          setLongs(longs);
+          setShorts(filtered.filter((v) => v.is_short));
+          setLongs(filtered.filter((v) => !v.is_short));
         } else {
-          throw new Error('데이터 형식 오류');
+          throw new Error("데이터 형식 오류");
         }
       } catch (error) {
-        console.warn('🔁 API 오류 발생, 더미 데이터를 사용합니다:', error);
+        console.warn("🔁 API 오류 발생, 더미 데이터를 사용합니다:", error);
 
         const fromDate = new Date(dateRange.from);
         const toDate = dateRange.to ? new Date(dateRange.to) : fromDate;
@@ -193,18 +197,15 @@ const VideosTab: React.FC<VideosTabProps> = ({ channel, period, dateRange }) => 
           return publishDate >= fromDate && publishDate <= toDate;
         });
 
-        const shorts = fallbackFiltered.filter((v) => v.is_short);
-        const longs = fallbackFiltered.filter((v) => !v.is_short);
-
-        setShorts(shorts);
-        setLongs(longs);
+        setShorts(fallbackFiltered.filter((v) => v.is_short));
+        setLongs(fallbackFiltered.filter((v) => !v.is_short));
       } finally {
         setLoading(false);
       }
     };
 
     fetchVideos();
-  }, [channel, dateRange.from, dateRange.to]); // 👈 수정된 의존성
+  }, [keyword, dateRange.from, dateRange.to]);
 
   return (
     <div className="space-y-10">

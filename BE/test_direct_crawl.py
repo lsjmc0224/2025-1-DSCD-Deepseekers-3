@@ -8,30 +8,47 @@ from app.crawler.service import CrawlerService
 async def run_direct_crawl_test():
     db = SessionLocal()
     try:
-        keyword_text = "밤티라미수"
+        keyword_text = "스웨덴젤리"
 
         # 기존 키워드 존재 확인
         keyword_obj = db.query(Keywords).filter_by(keyword=keyword_text).first()
+
         if keyword_obj:
             print(f"[SKIP] 이미 존재하는 키워드: {keyword_text}")
-            return
+        else:
+            # 새 키워드 추가
+            print(f"[LOG] 신규 키워드 추가: {keyword_text}")
+            keyword_obj = Keywords(keyword=keyword_text, searched_at=datetime.now())
+            db.add(keyword_obj)
+            db.commit()
+            db.refresh(keyword_obj)
 
-        # 새 키워드 추가
-        print(f"[LOG] 신규 키워드 추가: {keyword_text}")
-        new_keyword = Keywords(keyword=keyword_text, searched_at=datetime.now())
-        db.add(new_keyword)
-        db.commit()
-        db.refresh(new_keyword)
-
-        # 크롤링 실행
-        service = CrawlerService()
-        youtube_period = {"starttime": "20241001", "endtime": "20241031"}
-        instiz_period = {"starttime": "20241001", "endtime": "20241031"}
-        tiktok_period = {"start_date": "2024-10-01", "end_date": "2024-10-31"}
-
+        # ✅ 크롤링 실행은 공통적으로 keyword_obj 사용
         print(f"[LOG] 크롤링 시작: {keyword_text}")
+        service = CrawlerService()
+
+        # ✅ 날짜 한 쌍만 지정
+        start_date = "2025-02-04"
+        end_date = "2025-02-14"
+
+        # ✅ 형식 맞게 자동 할당
+        youtube_period = {
+            "starttime": start_date.replace("-", ""),
+            "endtime": end_date.replace("-", "")
+        }
+
+        instiz_period = {
+            "starttime": start_date.replace("-", ""),
+            "endtime": end_date.replace("-", "")
+        }
+
+        tiktok_period = {
+            "start_date": start_date,
+            "end_date": end_date
+        }
+
         result = await service.crawl_all(
-            keyword_obj=new_keyword,
+            keyword_obj=keyword_obj,
             youtube_period=youtube_period,
             instiz_period=instiz_period,
             tiktok_period=tiktok_period

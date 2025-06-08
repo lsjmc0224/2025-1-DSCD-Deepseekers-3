@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 const App = () => {
   // 타이틀 변경
   useEffect(() => {
-    document.title = "밤 티라미수 데이터 분석 대시보드";
+    document.title = "SNATCH";
   }, []);
 
   return (

@@ -143,7 +143,8 @@ class CrawlingRepository:
                     parent_comment_id=comment["parent_comment_id"],
                     is_reply=comment["is_reply"],
                     created_at=comment["created_at"],
-                    is_analyzed=False
+                    is_analyzed=False,
+                    collected_at=comment["collected_at"]
                 )
                 self.db.add(new_comment)
                 saved_comments += 1
