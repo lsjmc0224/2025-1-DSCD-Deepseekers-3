@@ -1,7 +1,7 @@
 # NLP 파이프라인 프로젝트
 
 ## 📁 디렉터리 구조
-kcelectra-base-DC/    ← GitHub·Hugging Face 공통 루트
+NLP/    ← GitHub·Hugging Face 공통 루트
 
 ├─requirements
 
