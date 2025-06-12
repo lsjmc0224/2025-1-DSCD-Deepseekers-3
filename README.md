@@ -5,6 +5,7 @@
 https://www.youtube.com/watch?v=kX44fCQQjFY
 
 #NLP
+
 편의점 디저트 리뷰 데이터 전처리 → 문장 분리 → 감성 분류 → 키워드 멀티레이블 분류를 모듈화하고,  
 `total.py`로 한 번에 실행 가능한 end-to-End NLP 파이프라인입니다.  
 학습된 KcELECTRA 모델 체크포인트는 Hugging Face Hub에, 코드와 설정은 GitHub에 공개되어 있어 누구나 쉽게 재현·확장할 수 있습니다.
