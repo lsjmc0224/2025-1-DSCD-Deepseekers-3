@@ -4,6 +4,41 @@
 # 시연 동영상
 https://www.youtube.com/watch?v=kX44fCQQjFY
 
+#NLP
+편의점 디저트 리뷰 데이터 전처리 → 문장 분리 → 감성 분류 → 키워드 멀티레이블 분류를 모듈화하고,  
+`total.py`로 한 번에 실행 가능한 end-to-End NLP 파이프라인입니다.  
+학습된 KcELECTRA 모델 체크포인트는 Hugging Face Hub에, 코드와 설정은 GitHub에 공개되어 있어 누구나 쉽게 재현·확장할 수 있습니다.
+
+kcelectra-base-DC/ # GitHub·Hugging Face 공통 루트
+자세한 파이프라인은 NLP폴더 내 readme에 첨부하였습니다.
+---
+
+## ⚙️ 설치 및 실행
+
+1. **레포지터리 클론**  
+   ```bash
+   git clone https://github.com/your-username/kcelectra-base-DC.git
+   cd kcelectra-base-DC
+2. 의존성 설치
+pip install -r requirements.txt
+
+3. config/default.yaml 수정
+data.input_csv, data.intermediate_dir, data.output_csv
+paths.scripts_dir, paths.model_dir (허브 레포 ID 혹은 로컬 경로)
+sentiment.max_length, sentiment.batch_size 등
+
+4. 전체 파이프라인 실행
+python src/total.py --config config/default.yaml
+
+
+🚀 Hugging Face Hub 연동
+from transformers import ElectraTokenizer, TFElectraForSequenceClassification
+repo_id = "alsxxxz/kcelectra-base-DC"
+tokenizer = ElectraTokenizer.from_pretrained(repo_id)
+model     = TFElectraForSequenceClassification.from_pretrained(repo_id, num_labels=2)
+
+
+
 ## 0. how to start (BE, DA)
 1. `python 3.12` 설치
 2. bash에서 가상환경 / 패키지 설치하기
@@ -29,3 +64,4 @@ python comment_scrapper.py
 python preprocess.py
 ```
 4. DA/data 폴더에서 파일 확인
+   
