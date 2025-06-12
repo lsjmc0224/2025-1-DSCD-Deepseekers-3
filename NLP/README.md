@@ -1,35 +1,38 @@
 # NLP 파이프라인 프로젝트
 
 ## 📁 디렉터리 구조
-kcelectra-base-DC/
+kcelectra-base-DC/              ← GitHub·Hugging Face 공통 루트
+
+├─requirements
+│
 ├─ config/
-
-│   └─ default.yaml # 설정을 한 곳에서 관리 data, path, 파라미터 모두 여기서 조정
-
+│   └─ default.yaml             ← 데이터 경로·스크립트 위치·파라미터를 한 곳에서 관리
+│
 ├─ src/
-
-│   ├─ text_cleaner.py
-
-│   ├─ sentence_splitter.py
-
-│   ├─ sentiment.py
-
-│   ├─ keyword_classifier.py
-
-│   └─ total.py
-
+│   ├─ text_cleaner.py               ← 텍스트 정제
+│   ├─ sentence_splitter.py      ← 문장 단위 분리
+│   ├─ [sentiment.py](http://sentiment.py/)                   ← KcELECTRA 감성 분류
+│   ├─ keyword_classifier.py    ← 키워드 멀티레이블 분류
+│   └─ [total.py](http://total.py/)                              ← 위 4단계를 순차 실행하는 오케스트레이터
+│
 ├─ Data/
 
-│   └─ test_data_final.csv
+│   └─ intermediate/
 
------------------------------------ 로컬에서 저장된 거 쓰는 경우에만 아래 파일 필요
+│        ├─step1_clean.csv
 
-└─ Bert_model_beomi_KcELECTRA-base-v2022_maxlen_64/
+│        ├─step2_split.csv
 
-    ├─ config.json
-    ├─ vocab.txt
-    ├─ tf_model.h5
-    └─ …
+│        ├─step3_sentiment.csv
+│   └─ test_data_final.csv      ← 파이프라인 입력 데이터
+
+│   └─ test_data_final_processed.csv      ← 파이프라인 실행 후 결과 csv
+│
+└─ Bert_model_beomi_KcELECTRA-base-v2022_maxlen_64/  ← 로컬 모델 사용 시에만 필요
+├─ config.json              ← 모델 설정
+├─ vocab.txt                ← 토크나이저 사전
+├─ tf_model.h5              ← 학습된 가중치
+└─ special_tokens_map.json, tokenizer_config.json
 
 
 
