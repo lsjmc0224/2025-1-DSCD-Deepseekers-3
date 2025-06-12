@@ -1,19 +1,32 @@
 # NLP 파이프라인 프로젝트
 
 ## 📁 디렉터리 구조
-kcelectra-base-DC/              ← GitHub·Hugging Face 공통 루트
+kcelectra-base-DC/    ← GitHub·Hugging Face 공통 루트
 
 ├─requirements
+
 │
+
 ├─ config/
+
+
 │   └─ default.yaml             ← 데이터 경로·스크립트 위치·파라미터를 한 곳에서 관리
+
 │
+
+
 ├─ src/
+
 │   ├─ text_cleaner.py               ← 데이터 전처리
+
 │   ├─ sentence_splitter.py      ← 문장 단위 분리
+
 │   ├─ sentiment.py                    ← KcELECTRA 감성 분류
+
 │   ├─ keyword_classifier.py    ← 키워드 멀티레이블 분류
+
 │   └─ total.py                              ← 위 4단계를 순차 실행하는 오케스트레이터
+
 │
 
 ├─ Data/                                 # 파이프라인 입력 & 중간·최종 결과
