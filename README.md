@@ -10,24 +10,25 @@ https://www.youtube.com/watch?v=kX44fCQQjFY
 학습된 KcELECTRA 모델 체크포인트는 Hugging Face Hub에, 코드와 설정은 GitHub에 공개되어 있어 누구나 쉽게 재현·확장할 수 있습니다.
 
 kcelectra-base-DC/ # GitHub·Hugging Face 공통 루트
+
 자세한 파이프라인은 NLP폴더 내 readme에 첨부하였습니다.
 ---
 
 ## ⚙️ 설치 및 실행
 
 1. **레포지터리 클론**  
-   ```bash
    git clone https://github.com/your-username/kcelectra-base-DC.git
    cd kcelectra-base-DC
-2. 의존성 설치
+   
+3. 의존성 설치
 pip install -r requirements.txt
 
-3. config/default.yaml 수정
+4. config/default.yaml 수정
 data.input_csv, data.intermediate_dir, data.output_csv
 paths.scripts_dir, paths.model_dir (허브 레포 ID 혹은 로컬 경로)
 sentiment.max_length, sentiment.batch_size 등
 
-4. 전체 파이프라인 실행
+5. 전체 파이프라인 실행
 python src/total.py --config config/default.yaml
 
 
